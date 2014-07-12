@@ -14,6 +14,12 @@
 #include <libopencm3/stm32/f4/flash.h>
 #include <libopencm3/stm32/f4/pwr.h>
 
+#include "board.h"
+
+static uint16_t board_leds[BOARD_LEDS_NUM] = {
+    BOARD_LED1_GPIO, BOARD_LED2_GPIO, BOARD_LED3_GPIO, BOARD_LED4_GPIO
+};
+
 void usart_print(const uint8_t *data, size_t len)
 {
     while (len--)
@@ -30,67 +36,54 @@ void put_char(void *p, char c)
     usart_send_blocking(USART6, c);
 }
 
-void switch_led(int led)
+void set_led(uint8_t led, uint8_t val)
 {
     uint16_t gpio;
-    volatile uint32_t val;
 
-    switch (led) {
-    case 0:
-        gpio = GPIO12;
-        break;
-    case 1:
-        gpio = GPIO13;
-        break;
-    case 2:
-        gpio = GPIO14;
-        break;
-    case 3:
-    default:
-        gpio = GPIO15;
-        break;
-    }
+    if (!(gpio = (led < BOARD_LEDS_NUM) ? board_leds[led] : 0))
+        return;
 
-    val = gpio_get(GPIOD, gpio);
     if (val == 0)
-        gpio_set(GPIOD, gpio);
+        gpio_clear(BOARD_LED_PORT, gpio);
     else
-        gpio_clear(GPIOD, gpio);
+        gpio_set(BOARD_LED_PORT, gpio);
 }
 
 
-void halt_with_error ()
+void halt_with_error (void)
 {
-    gpio_set(GPIOD, GPIO14);
+    set_led(BOARD_LED_RED, 1);
     printf("\n\n\n\nError, halt!\n\n\n\n");
     while(1);
 }
 
-PRIMITIVE_UNSPEC(#%sleep, arch_sleep, 1)
-{
-	volatile static int a, b;
-
-	a1 = decode_int (arg1);
-
-	for(a = 0; a < a1; a++) {
-		for(b = 0; b < 1000; b++) {
-			__asm__ __volatile__("nop");
-		}
-	}
-
-	arg1 = OBJ_FALSE;
-}
-
-PRIMITIVE_UNSPEC(#%set-led!, arch_set_led, 1)
+PRIMITIVE_UNSPEC(#%putchar, arch_putchar, 1)
 {
     a1 = decode_int(arg1);
+    usart_send_blocking(USART6, (char)a1);
+}
 
-    if (a1 == 0)
-        gpio_set(GPIOD, GPIO12);
-    else
-        gpio_clear(GPIOD, GPIO12);
+PRIMITIVE_UNSPEC(#%sleep, arch_sleep, 1)
+{
+    volatile static int a, b;
+
+    a1 = decode_int(arg1);
+
+    for(a = 0; a < a1; a++) {
+        for(b = 0; b < 1000; b++) {
+            __asm__ __volatile__("nop");
+        }
+    }
 
     arg1 = OBJ_FALSE;
+}
+
+PRIMITIVE_UNSPEC(#%set-led!, arch_set_led, 2)
+{
+    set_led(decode_int(arg1), decode_int(arg2));
+
+    arg1 = OBJ_FALSE;
+    arg2 = OBJ_FALSE;
 }
 
 //#if 0
@@ -202,21 +195,10 @@ void main ()
     init();
     usart_start();
 
-    init_printf(NULL,put_char);
+    init_printf(NULL, put_char);
 
-#if 0
-    volatile int i;
-    while (1) {
-        for (i = 0; i < 1000000; i++)
-            __asm__ __volatile__("nop");
-        switch_led(0);
-        switch_led(1);
-        for (i = 0; i < 1000000; i++)
-            __asm__ __volatile__("nop");
-        printf("Test: %X\r\n", 6);
-    }
-#endif
     printf("Starting interpreter.\r\n");
+
     interpreter();
 }
 
