@@ -49,7 +49,7 @@ void show_type (obj o)
 		// ROM closures don't exist
 	}
 
-	printf("\n");
+	printf("\r\n");
 }
 
 void show_obj (obj o)
@@ -141,11 +141,11 @@ loop:
 }
 
 void show_state (rom_addr pc) {
-	printf ("\n");
+        printf ("\r\n");
 	printf ("pc=0x%04x bytecode=0x%02x env=", pc, rom_get (pc));
 	show_obj (env);
 	printf (" cont=");
 	show_obj (cont);
-	printf ("\n");
+	printf ("\r\n");
 	fflush (stdout);
 }

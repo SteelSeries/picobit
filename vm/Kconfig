@@ -4,7 +4,6 @@ choice
 	prompt "Target architecture"
 	help
 	  Select a platform to run Picobit VM on.
-	  
 
 	config	ARCH_HOST
 		bool "Host executable"
@@ -14,7 +13,6 @@ choice
 		help
 		  Build Picobit as a host (Linux) executable for easy
 		  debugging.
-		  
 
 	config	ARCH_ARM
 		bool "ARM microcontrollers"

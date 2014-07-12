@@ -1,6 +1,11 @@
 *.o
 *.hex
+*.bin
 *~
 TAGS
 picobit-vm
 compiled/
+GTAGS
+GPATH
+GSYMS
+GRTAGS

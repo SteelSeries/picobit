@@ -5,10 +5,17 @@ config CROSS_COMPILER
 choice
 	prompt "Processor core type"
 
-	config ARM_CORTEX_M3
-	bool "Cortex-M3"
+	config ARM_STM32VLDISCOVERY
+	bool "ARM STM32F100rb based kit"
+
+	config ARM_STM32F4DISCOVERY
+	bool "ARM STM32F407 based kit"
 endchoice
 
-if ARM_CORTEX_M3
-source "arch/arm/cortex-m3/Kconfig"
+if ARM_STM32VLDISCOVERY
+source "arch/arm/stm32vldiscovery/Kconfig"
+endif
+
+if ARM_STM32F4DISCOVERY
+source "arch/arm/stm32f4discovery/Kconfig"
 endif

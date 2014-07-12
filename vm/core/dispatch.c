@@ -142,7 +142,7 @@ dispatch:
 		/*************************************************************************/
 	case PUSH_CONSTANT1 :
 
-		IF_TRACE(printf("  (push-constant "); show_obj (bytecode_lo4); printf (")\n"));
+		IF_TRACE(printf("  (push-constant "); show_obj (bytecode_lo4); printf (")\r\n"));
 
 		arg1 = bytecode_lo4;
 
@@ -153,7 +153,7 @@ dispatch:
 		/*************************************************************************/
 	case PUSH_CONSTANT2 :
 
-		IF_TRACE(printf("  (push-constant "); show_obj (bytecode_lo4+16); printf (")\n"));
+		IF_TRACE(printf("  (push-constant "); show_obj (bytecode_lo4+16); printf (")\r\n"));
 		arg1 = bytecode_lo4+16;
 
 		push_arg1();
@@ -163,7 +163,7 @@ dispatch:
 		/*************************************************************************/
 	case PUSH_STACK1 :
 
-		IF_TRACE(printf("  (push-stack %d)\n", bytecode_lo4));
+		IF_TRACE(printf("  (push-stack %d)\r\n", bytecode_lo4));
 
 		arg1 = env;
 
@@ -181,7 +181,7 @@ dispatch:
 		/*************************************************************************/
 	case PUSH_STACK2 :
 
-		IF_TRACE(printf("  (push-stack %d)\n", bytecode_lo4+16));
+		IF_TRACE(printf("  (push-stack %d)\r\n", bytecode_lo4+16));
 
 		bytecode_lo4 += 16;
 
@@ -201,7 +201,7 @@ dispatch:
 		/*************************************************************************/
 	case PUSH_GLOBAL :
 
-		IF_TRACE(printf("  (push-global %d)\n", bytecode_lo4));
+		IF_TRACE(printf("  (push-global %d)\r\n", bytecode_lo4));
 
 		arg1 = get_global (bytecode_lo4);
 
@@ -212,7 +212,7 @@ dispatch:
 		/*************************************************************************/
 	case SET_GLOBAL :
 
-		IF_TRACE(printf("  (set-global %d)\n", bytecode_lo4));
+		IF_TRACE(printf("  (set-global %d)\r\n", bytecode_lo4));
 
 		set_global (bytecode_lo4, pop());
 
@@ -221,7 +221,7 @@ dispatch:
 		/*************************************************************************/
 	case CALL :
 
-		IF_TRACE(printf("  (call %d)\n", bytecode_lo4));
+		IF_TRACE(printf("  (call %d)\r\n", bytecode_lo4));
 
 		pop_procedure ();
 		build_env (handle_arity_and_rest_param (bytecode_lo4));
@@ -237,7 +237,7 @@ dispatch:
 		/*************************************************************************/
 	case JUMP :
 
-		IF_TRACE(printf("  (jump %d)\n", bytecode_lo4));
+		IF_TRACE(printf("  (jump %d)\r\n", bytecode_lo4));
 
 		pop_procedure ();
 		build_env (handle_arity_and_rest_param (bytecode_lo4));
@@ -259,7 +259,7 @@ dispatch:
 
 			FETCH_NEXT_BYTECODE();
 
-			IF_TRACE(printf("  (call-toplevel 0x%04x)\n",
+			IF_TRACE(printf("  (call-toplevel 0x%04x)\r\n",
 			                ((arg2 << 8) | bytecode) + CODE_START));
 
 			entry = (arg2 << 8) + bytecode + CODE_START;
@@ -282,7 +282,7 @@ dispatch:
 
 			FETCH_NEXT_BYTECODE();
 
-			IF_TRACE(printf("  (jump-toplevel 0x%04x)\n",
+			IF_TRACE(printf("  (jump-toplevel 0x%04x)\r\n",
 			                ((arg2 << 8) | bytecode) + CODE_START));
 
 			entry = (arg2 << 8) + bytecode + CODE_START;
@@ -304,7 +304,7 @@ dispatch:
 
 			FETCH_NEXT_BYTECODE();
 
-			IF_TRACE(printf("  (goto 0x%04x)\n",
+			IF_TRACE(printf("  (goto 0x%04x)\r\n",
 			                (arg2 << 8) + bytecode + CODE_START));
 
 			pc = (arg2 << 8) + bytecode + CODE_START;
@@ -317,7 +317,7 @@ dispatch:
 
 			FETCH_NEXT_BYTECODE();
 
-			IF_TRACE(printf("  (goto-if-false 0x%04x)\n",
+			IF_TRACE(printf("  (goto-if-false 0x%04x)\r\n",
 			                (arg2 << 8) + bytecode + CODE_START));
 
 			if (pop() == OBJ_FALSE) {
@@ -334,7 +334,7 @@ dispatch:
 
 			entry = (arg2 << 8) | bytecode;
 
-			IF_TRACE(printf("  (closure 0x%04x)\n", entry));
+			IF_TRACE(printf("  (closure 0x%04x)\r\n", entry));
 
 			arg3 = pop(); // env
 
@@ -354,7 +354,7 @@ dispatch:
 		case 5: // call-toplevel-rel8
 			FETCH_NEXT_BYTECODE(); // TODO the short version have a lot in common with the long ones, abstract ?
 
-			IF_TRACE(printf("  (call-toplevel-rel8 0x%04x)\n", pc + bytecode - 128));
+			IF_TRACE(printf("  (call-toplevel-rel8 0x%04x)\r\n", pc + bytecode - 128));
 
 			entry = pc + bytecode - 128;
 			arg1 = OBJ_NULL;
@@ -372,7 +372,7 @@ dispatch:
 		case 6: // jump-toplevel-rel8
 			FETCH_NEXT_BYTECODE();
 
-			IF_TRACE(printf("  (jump-toplevel-rel8 0x%04x)\n", pc + bytecode - 128));
+			IF_TRACE(printf("  (jump-toplevel-rel8 0x%04x)\r\n", pc + bytecode - 128));
 
 			entry = pc + bytecode - 128;
 			arg1 = OBJ_NULL;
@@ -389,7 +389,7 @@ dispatch:
 		case 7: // goto-rel8
 			FETCH_NEXT_BYTECODE();
 
-			IF_TRACE(printf("  (goto-rel8 0x%04x)\n", pc + bytecode - 128));
+			IF_TRACE(printf("  (goto-rel8 0x%04x)\r\n", pc + bytecode - 128));
 
 			pc = pc + bytecode - 128;
 
@@ -398,7 +398,7 @@ dispatch:
 		case 8: // goto-if-false-rel8
 			FETCH_NEXT_BYTECODE();
 
-			IF_TRACE(printf("  (goto-if-false-rel8 0x%04x)\n", pc + bytecode - 128));
+			IF_TRACE(printf("  (goto-if-false-rel8 0x%04x)\r\n", pc + bytecode - 128));
 
 			if (pop() == OBJ_FALSE) {
 				pc = pc + bytecode - 128;
@@ -411,7 +411,7 @@ dispatch:
 
 			entry = pc - CODE_START + bytecode - 128;
 
-			IF_TRACE(printf("  (closure-rel8 0x%04x)\n", entry));
+			IF_TRACE(printf("  (closure-rel8 0x%04x)\r\n", entry));
 
 			arg3 = pop(); // env
 
@@ -440,7 +440,7 @@ dispatch:
 		case 14: // push_global [long]
 			FETCH_NEXT_BYTECODE();
 
-			IF_TRACE(printf("  (push-global [long] %d)\n", bytecode));
+			IF_TRACE(printf("  (push-global [long] %d)\r\n", bytecode));
 
 			arg1 = get_global (bytecode);
 
@@ -451,7 +451,7 @@ dispatch:
 		case 15: // set_global [long]
 			FETCH_NEXT_BYTECODE();
 
-			IF_TRACE(printf("  (set-global [long] %d)\n", bytecode));
+			IF_TRACE(printf("  (set-global [long] %d)\r\n", bytecode));
 
 			set_global (bytecode, pop());
 
@@ -467,7 +467,7 @@ dispatch:
 
 		FETCH_NEXT_BYTECODE();
 
-		IF_TRACE(printf("  (push [long] 0x%04x)\n", (bytecode_lo4 << 8) + bytecode));
+		IF_TRACE(printf("  (push [long] 0x%04x)\r\n", (bytecode_lo4 << 8) + bytecode));
 
 		// necessary since SIXPIC would have kept the result of the shift at 8 bits
 		arg1 = bytecode_lo4;
@@ -480,7 +480,7 @@ dispatch:
 
 	case JUMP_TOPLEVEL_REL4 :
 
-		IF_TRACE(printf("  (jump-toplevel-rel4 0x%04x)\n", pc + (bytecode & 0x0f)));
+		IF_TRACE(printf("  (jump-toplevel-rel4 0x%04x)\r\n", pc + (bytecode & 0x0f)));
 
 		entry = pc + (bytecode & 0x0f);
 		arg1 = OBJ_NULL;
@@ -498,7 +498,7 @@ dispatch:
 
 	case GOTO_IF_FALSE_REL4 :
 
-		IF_TRACE(printf("  (goto-if-false-rel4 0x%04x)\n", pc + (bytecode & 0x0f)));
+		IF_TRACE(printf("  (goto-if-false-rel4 0x%04x)\r\n", pc + (bytecode & 0x0f)));
 
 		if (pop() == OBJ_FALSE) {
 			pc = pc + (bytecode & 0x0f);

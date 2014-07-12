@@ -1,4 +1,4 @@
-ifdef CONFIG_ARM_CPU_STM32F100RB
+ifdef CONFIG_ARM_STM32VLDISCOVERY
 ldscript := stm32f100rb.ld
 endif
 
@@ -15,7 +15,7 @@ load-address := \#x8008000
 arch-all: picobit.hex
 
 picobit.hex: picobit.elf
-	$(CROSS)objcopy -O ihex $^ $@
+	$(OBJCOPY) -O ihex $^ $@
 
 picobit.elf: $(obj-y) .config
-	$(CROSS)cc $(CFLAGS) -o $@ $(obj-y)
+	$(CC) $(CFLAGS) -o $@ $(obj-y)

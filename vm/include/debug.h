@@ -6,9 +6,17 @@
 #endif
 
 #ifdef CONFIG_VM_DEBUG
+#ifdef CONFIG_ARM_STM32F4DISCOVERY
+  #include <printf.h>
+
+  #define printf tfp_printf
+  #define sprintf tfp_sprintf
+  #define fflush do {} while (0)
+#endif
 #define IF_TRACE(x) x
 #else
 #define IF_TRACE(x)
+#define led_blink(x...)
 #endif
 
 #ifdef CONFIG_GC_DEBUG
