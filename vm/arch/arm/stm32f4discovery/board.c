@@ -7,6 +7,8 @@
 #include <bignum.h>
 #include <printf.h>
 
+#include <libopencm3/cm3/systick.h>
+#include <libopencm3/cm3/nvic.h>
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/rcc.h>
@@ -15,40 +17,38 @@
 #include <libopencm3/stm32/f4/pwr.h>
 
 #include "board.h"
+#include "rcc.h"
+#include "usart.h"
+#include "timer.h"
+#include "led.h"
 
-static uint16_t board_leds[BOARD_LEDS_NUM] = {
-    BOARD_LED1_GPIO, BOARD_LED2_GPIO, BOARD_LED3_GPIO, BOARD_LED4_GPIO
-};
-
-void usart_print(const uint8_t *data, size_t len)
+static inline uint16_t irqsave(void)
 {
-    while (len--)
-        usart_send_blocking(USART6, *data++);
+    uint16_t primask;
+
+    __asm__ __volatile__
+        (
+            "\tmrs    %0, primask\n"
+            "\tcpsid  i\n"
+            : "=r" (primask)
+            :
+            : "memory");
+
+    return primask;
 }
 
-void print(const char *msg, size_t len)
+static inline void irqrestore(uint16_t flags)
 {
-    usart_print((const uint8_t *)msg, len);
+    __asm__ __volatile__
+        (
+            "\ttst    %0, #1\n"
+            "\tbne    1f\n"
+            "\tcpsie  i\n"
+            "1:\n"
+            :
+            : "r" (flags)
+            : "memory");
 }
-
-void put_char(void *p, char c)
-{
-    usart_send_blocking(USART6, c);
-}
-
-void set_led(uint8_t led, uint8_t val)
-{
-    uint16_t gpio;
-
-    if (!(gpio = (led < BOARD_LEDS_NUM) ? board_leds[led] : 0))
-        return;
-
-    if (val == 0)
-        gpio_clear(BOARD_LED_PORT, gpio);
-    else
-        gpio_set(BOARD_LED_PORT, gpio);
-}
-
 
 void halt_with_error (void)
 {
@@ -57,142 +57,30 @@ void halt_with_error (void)
     while(1);
 }
 
-PRIMITIVE_UNSPEC(#%putchar, arch_putchar, 1)
+void __nvic_enable(void)
 {
-    a1 = decode_int(arg1);
-    usart_send_blocking(USART6, (char)a1);
+    /* USB CDC/ACM */
+    nvic_enable_irq(NVIC_OTG_FS_IRQ);
+    /* SPI RX */
+    nvic_enable_irq(NVIC_DMA1_STREAM3_IRQ);
+    /* SPI TX */
+    nvic_enable_irq(NVIC_DMA1_STREAM4_IRQ);
 }
 
-PRIMITIVE_UNSPEC(#%sleep, arch_sleep, 1)
+void put_char(void *p, char c)
 {
-    volatile static int a, b;
-
-    a1 = decode_int(arg1);
-
-    for(a = 0; a < a1; a++) {
-        for(b = 0; b < 1000; b++) {
-            __asm__ __volatile__("nop");
-        }
-    }
-
-    arg1 = OBJ_FALSE;
+    usart_putchar(c);
 }
-
-PRIMITIVE_UNSPEC(#%set-led!, arch_set_led, 2)
-{
-    set_led(decode_int(arg1), decode_int(arg2));
-
-    arg1 = OBJ_FALSE;
-    arg2 = OBJ_FALSE;
-}
-
-//#if 0
-static void __clock_setup_hsi(const clock_scale_t *clock)
-{
-	/* Enable internal high-speed oscillator. */
-	rcc_osc_on(HSI);
-	rcc_wait_for_osc_ready(HSI);
-	/* Select HSI as SYSCLK source. */
-	rcc_set_sysclk_source(RCC_CFGR_SW_HSI);
-        rcc_wait_for_sysclk_status(HSI);
-
-	/* Enable/disable high performance mode */
-	if (!clock->power_save) {
-		pwr_set_vos_scale(0);
-	} else {
-		pwr_set_vos_scale(1);
-	}
-
-        rcc_osc_off(PLL);
-        while ((RCC_CR & RCC_CR_PLLRDY) != 0);
-
-	rcc_set_main_pll_hsi(clock->pllm, clock->plln,
-                             clock->pllp, clock->pllq);
-
-        rcc_osc_on(PLL);
-	/* Enable PLL oscillator and wait for it to stabilize. */
-	rcc_wait_for_osc_ready(PLL);
-
-	rcc_set_hpre(clock->hpre);
-	rcc_set_ppre1(clock->ppre1);
-	rcc_set_ppre2(clock->ppre2);
-
-	/* Configure flash settings. */
-	flash_set_ws(clock->flash_config);
-	/* Select PLL as SYSCLK source. */
-	rcc_set_sysclk_source(RCC_CFGR_SW_PLL);
-	/* Wait for PLL clock to be selected. */
-	rcc_wait_for_sysclk_status(PLL);
-
-	/* Set the peripheral clock frequencies used. */
-	rcc_ppre1_frequency = clock->apb1_frequency;
-	rcc_ppre2_frequency = clock->apb2_frequency;
-}
-//#endif
-void rcc_enable(void)
-{
-    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_SPI2EN);
-    rcc_peripheral_enable_clock(&RCC_APB2ENR,
-                                RCC_APB2ENR_SYSCFGEN|RCC_APB2ENR_USART6EN);
-    rcc_peripheral_enable_clock(&RCC_AHB1ENR,
-                                RCC_AHB1ENR_IOPAEN|RCC_AHB1ENR_IOPBEN|
-                                RCC_AHB1ENR_IOPCEN|RCC_AHB1ENR_IOPDEN);
-    rcc_peripheral_enable_clock(&RCC_AHB2ENR, RCC_AHB2ENR_OTGFSEN);
-    rcc_peripheral_enable_clock(&RCC_AHB1ENR, RCC_AHB1ENR_DMA1EN);
-}
-
-void __gpio_init(void)
-{
-    /* LED's */
-    gpio_mode_setup(GPIOD, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE,
-                    GPIO12 | GPIO13 | GPIO14 | GPIO15);
-    /* USART */
-    gpio_mode_setup(GPIOC, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO6); /* Tx */
-    gpio_mode_setup(GPIOC, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO7); /* Rx */
-    gpio_set_output_options(GPIOC, GPIO_OTYPE_OD, GPIO_OSPEED_25MHZ, GPIO7);
-    gpio_set_af(GPIOC, GPIO_AF8, GPIO6);
-    gpio_set_af(GPIOC, GPIO_AF8, GPIO7);
-}
-
-void init(void)
-{
-
-    clock_scale_t scale = {
-        .pllm = 4,
-        .plln = 84,
-        .pllp = 2,
-        .pllq = 7,
-        .hpre = RCC_CFGR_HPRE_DIV_NONE,
-        .ppre1 = RCC_CFGR_PPRE_DIV_4,
-        .ppre2 = RCC_CFGR_PPRE_DIV_2,
-        .power_save = 1,
-        .flash_config = FLASH_ACR_ICE | FLASH_ACR_DCE | FLASH_ACR_LATENCY_5WS,
-        .apb1_frequency = 168000000ul/4,
-        .apb2_frequency = 168000000ul/2,
-    };
-
-    __clock_setup_hsi(&scale);
-    rcc_enable();
-    __gpio_init();
-}
-
-void usart_start(void)
-{
-    /* USART configuration */
-    usart_set_baudrate(USART6, 115200);
-    usart_set_databits(USART6, 8);
-    usart_set_stopbits(USART6, USART_STOPBITS_1);
-    usart_set_mode(USART6, USART_MODE_TX_RX);
-    usart_set_parity(USART6, USART_PARITY_NONE);
-    usart_set_flow_control(USART6, USART_FLOWCONTROL_NONE);
-
-    usart_enable(USART6);
-}
-
 
 void main ()
 {
-    init();
+    /* Interrupts */
+    __nvic_enable();
+
+    rcc_enable();
+
+    led_init();
+    timer_init();
     usart_start();
 
     init_printf(NULL, put_char);

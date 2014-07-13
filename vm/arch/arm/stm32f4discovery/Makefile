@@ -13,7 +13,8 @@ CFLAGS += -mcpu=cortex-m4 -mthumb -g -fno-hosted -nostdlib \
           -L$(arch)/lib -T$(ldscript) -Wl,-warn-common -mfpu=fpv4-sp-d16 \
 	  -mlittle-endian -mthumb-interwork -mfloat-abi=hard -DSTM32F4
 
-arch-$(CONFIG_ARM_BOARD_STM32_F4DISCOVERY)   += board.c printf.c
+arch-$(CONFIG_ARM_BOARD_STM32_F4DISCOVERY)   += board.c rcc.c timer.c usart.c \
+						led.c printf.c primitives.c
 stdlib-$(CONFIG_ARM_BOARD_STM32_F4DISCOVERY) += board.scm
 
 load-address := \#x8008000
