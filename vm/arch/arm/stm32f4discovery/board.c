@@ -7,14 +7,9 @@
 #include <bignum.h>
 #include <printf.h>
 
-#include <libopencm3/cm3/systick.h>
 #include <libopencm3/cm3/nvic.h>
-#include <libopencm3/cm3/nvic.h>
-#include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/f4/flash.h>
-#include <libopencm3/stm32/f4/pwr.h>
 
 #include "board.h"
 #include "rcc.h"
@@ -65,6 +60,8 @@ void __nvic_enable(void)
     nvic_enable_irq(NVIC_DMA1_STREAM3_IRQ);
     /* SPI TX */
     nvic_enable_irq(NVIC_DMA1_STREAM4_IRQ);
+    /* USART6 IRQ. */
+    nvic_enable_irq(NVIC_USART6_IRQ);
 }
 
 void put_char(void *p, char c)

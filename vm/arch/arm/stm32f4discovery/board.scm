@@ -43,3 +43,14 @@
 	   (display (if x "#t" "#f")))
 	  (else
 	   (display "#<object>")))))
+
+(define (newline)
+  (#%putchar #\return)
+  (#%putchar #\newline))
+
+(define (displayln x) (display x) (newline))
+
+(define pp
+  (lambda (x)
+    (write x)
+    (newline)))

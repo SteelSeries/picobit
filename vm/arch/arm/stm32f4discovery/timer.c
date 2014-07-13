@@ -5,16 +5,22 @@
 
 #include "timer.h"
 
-static volatile uint32_t g_system_timer = 0;
+/* TODO:
+ * I can use RTC timer and look for overflow bit or use watchdog mechanism,
+ * which is better?
+ */
+
+volatile unsigned g_sys_timer = 0;
 
 void sys_tick_handler(void)
 {
-    g_system_timer++;
+    if (g_sys_timer > 0) g_sys_timer --;
 }
 
-uint32_t get_systick(void)
+void sleep(unsigned msec)
 {
-    return g_system_timer;
+    g_sys_timer = msec;
+    while (g_sys_timer > 0);
 }
 
 void timer_init(void)

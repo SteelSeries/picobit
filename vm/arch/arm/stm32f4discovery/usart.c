@@ -6,6 +6,29 @@
 
 #include "usart.h"
 
+void usart6_isr(void)
+{
+    static uint8_t data = 'A';
+
+    /* Check if we were called because of RXNE. */
+    if (((USART_CR1(USART6) & USART_CR1_RXNEIE) != 0) &&
+        ((USART_SR(USART6) & USART_SR_RXNE) != 0)) {
+        /* Retrieve the data from the peripheral. */
+        data = usart_recv(USART6);
+        /* Enable transmit interrupt so it sends back the data. */
+        usart_enable_tx_interrupt(USART6);
+    }
+
+    /* Check if we were called because of TXE. */
+    if (((USART_CR1(USART6) & USART_CR1_TXEIE) != 0) &&
+        ((USART_SR(USART6) & USART_SR_TXE) != 0)) {
+        /* Put data into the transmit register. */
+        usart_send(USART6, data);
+        /* Disable the TXE interrupt as we don't need it anymore. */
+        usart_disable_tx_interrupt(USART6);
+    }
+}
+
 void usart_print(const uint8_t *data, size_t len)
 {
     while (len--)
@@ -33,6 +56,9 @@ void usart_start(void)
     usart_set_mode(USART6, USART_MODE_TX_RX);
     usart_set_parity(USART6, USART_PARITY_NONE);
     usart_set_flow_control(USART6, USART_FLOWCONTROL_NONE);
+
+    /* Enable RX interrupts */
+    usart_enable_rx_interrupt(USART6);
 
     usart_enable(USART6);
 }

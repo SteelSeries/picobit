@@ -19,13 +19,9 @@ PRIMITIVE_UNSPEC(#%putchar, arch_putchar, 1)
 PRIMITIVE_UNSPEC(#%sleep, arch_sleep, 1)
 {
     uint16_t msec;
-    uint32_t ticks;
 
     msec = decode_int(arg1);
-
-    ticks = get_systick() + msec;
-    while (get_systick() < ticks);
-
+    sleep(msec);
     arg1 = OBJ_FALSE;
 }
 
