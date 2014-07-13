@@ -6,11 +6,11 @@
 #include "timer.h"
 
 /* TODO:
- * I can use RTC timer and look for overflow bit or use watchdog mechanism,
+ * Use RTC timer and look for overflow bit or use watchdog mechanism,
  * which is better?
  */
 
-volatile unsigned g_sys_timer = 0;
+volatile uint32_t g_sys_timer = 0;
 
 void sys_tick_handler(void)
 {

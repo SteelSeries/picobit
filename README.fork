@@ -1,1 +1,24 @@
-* Cortex-M4 port
+-*- mode:org -*-
+
+* STM32F4Discovery board port.
+
+** Some restrictions to take car of
+   - Size of VM shouldnt be over 16kb, the size of first page where VM will
+     reside. Using what is left of 16kb is complicated, so size up to 16kb
+     should be ok.
+   - Top level for ROM use is 1024KB - 32KB, maybe some additional
+     data/configuration on one of the first pages, that is why -32KB.
+   - Max memory usage up to 192KB, part of that memory is CCM(DMA uncapable)
+     and should be used taken care of accordingly.
+
+* TODO [2/9]
+
+- [ ] Clocks, timers
+- [ ] NAND interface
+- [ ] SD inteface
+- [ ] LWThreads
+- [ ] CDC/ACM
+- [ ] REPL
+- [ ] LCD
+- [X] USART output
+- [X] LED's
