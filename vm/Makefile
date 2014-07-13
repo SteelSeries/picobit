@@ -101,7 +101,7 @@ prim-gen = gawk -f scripts/scanner.awk -f scripts/prim-$(1).awk \
 .primitives.p: include/arch $(obj-y)
 	rm -f $@
 	for object in $(obj-y); do \
-		$(CROSS)cpp -DNO_PRIMITIVE_EXPAND $(CFLAGS) \
+		$(CROSS)cpp $(INCLUDE) -DNO_PRIMITIVE_EXPAND $(CFLAGS) \
 			$$object -o - >>$@; \
 	done
 	$(call prim-gen,headergen,include/gen.primitives.h)
