@@ -1,6 +1,6 @@
 #ifndef RTC_H
 #define RTC_H
 
-void rtc_init(void);
+void board_rtc_init(void);
 
 #endif

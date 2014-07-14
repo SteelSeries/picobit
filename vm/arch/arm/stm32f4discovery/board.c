@@ -14,6 +14,7 @@
 #include "board.h"
 #include "usart.h"
 #include "timer.h"
+#include "rtc.h"
 #include "led.h"
 
 void halt_with_error (void)
@@ -33,6 +34,9 @@ void __nvic_enable(void)
     nvic_enable_irq(NVIC_DMA1_STREAM4_IRQ);
     /* USART6 IRQ. */
     nvic_enable_irq(NVIC_USART6_IRQ);
+    /* RTC Wakeup and alarm IRQ's. */
+    nvic_enable_irq(NVIC_RTC_WKUP_IRQ);
+    nvic_enable_irq(NVIC_RTC_ALARM_IRQ);
 }
 
 void put_char(void *p, char c)
@@ -102,35 +106,62 @@ void rcc_enable(void)
 #ifdef CLOCK_HSI
     __clock_setup_hsi(void);
 #else
+    /* Enable LSI for RTC */
+    rcc_osc_on(LSI);
+    rcc_wait_for_osc_ready(LSI);
+
+    rcc_osc_bypass_enable(HSE);
     rcc_clock_setup_hse_3v3(&hse_8mhz_3v3[CLOCK_3V3_168MHZ]);
 #endif
-
-    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_SPI2EN);
+//    rcc_peripheral_enable_clock(&RCC_APB1ENR,
+//                                RCC_APB1ENR_SPI2EN|RCC_APB1ENR_PWREN);
     rcc_peripheral_enable_clock(&RCC_APB2ENR,
                                 RCC_APB2ENR_SYSCFGEN|RCC_APB2ENR_USART6EN);
-    rcc_peripheral_enable_clock(&RCC_AHB1ENR,
-                                RCC_AHB1ENR_IOPAEN|RCC_AHB1ENR_IOPBEN|
-                                RCC_AHB1ENR_IOPCEN|RCC_AHB1ENR_IOPDEN);
+//    rcc_peripheral_enable_clock(&RCC_AHB1ENR,
+//                                RCC_AHB1ENR_IOPAEN|RCC_AHB1ENR_IOPBEN|
+//                                RCC_AHB1ENR_IOPCEN|RCC_AHB1ENR_IOPDEN|
+//                                RCC_AHB1ENR_DMA1EN);
     rcc_peripheral_enable_clock(&RCC_AHB2ENR, RCC_AHB2ENR_OTGFSEN);
-    rcc_peripheral_enable_clock(&RCC_AHB1ENR, RCC_AHB1ENR_DMA1EN);
     rcc_periph_clock_enable(RCC_PWR);
+    rcc_periph_clock_enable(RCC_SPI2);
+    rcc_periph_clock_enable(RCC_GPIOA);
+    rcc_periph_clock_enable(RCC_GPIOB);
+    rcc_periph_clock_enable(RCC_GPIOC);
+    rcc_periph_clock_enable(RCC_GPIOD);
+    rcc_periph_clock_enable(RCC_RTC);
+    rcc_periph_clock_enable(RCC_TIM6);
+    rcc_periph_clock_enable(RCC_BKPSRAM);
 }
 
 void main ()
 {
     /* Interrupts */
     __nvic_enable();
-
     rcc_enable();
+    board_rtc_init();
+    timer_init();
 
     led_init();
-//    rtc_init();
-    timer_init();
     usart_start();
 
     init_printf(NULL, put_char);
 
+    printf("  RCC_CR: 0x%X\r\n", RCC_CR);
+    printf(" RCC_CSR: 0x%X\r\n", RCC_CSR);
+    printf("RCC_BDCR: 0x%x\r\n", RCC_BDCR);
+    printf("RCC_CFGR: 0x%x\r\n", RCC_CFGR);
+    printf(" RCC_CIR: 0x%x\r\n", RCC_CIR);
+    printf("Waiting for INITF.\r\n");
+
     printf("Starting interpreter.\r\n");
+#include <libopencm3/stm32/rtc.h>
+
+    while (1) {
+        sleep(1000);
+        printf("Tick: %d; Subseq: %d; Date: %d; \r\n",
+               (unsigned int) RTC_TR, (unsigned int) RTC_SSR,
+               (unsigned int) RTC_DR);
+    }
 
     interpreter();
 }
