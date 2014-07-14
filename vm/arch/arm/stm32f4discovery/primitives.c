@@ -7,7 +7,7 @@
 #include <bignum.h>
 
 #include "led.h"
-#include "timer.h"
+#include "time.h"
 #include "usart.h"
 
 PRIMITIVE_UNSPEC(#%putchar, arch_putchar, 1)
@@ -31,4 +31,13 @@ PRIMITIVE_UNSPEC(#%set-led!, arch_set_led, 2)
 
     arg1 = OBJ_FALSE;
     arg2 = OBJ_FALSE;
+}
+
+PRIMITIVE_UNSPEC(#%clock, arch_clock, 0)
+{
+    struct tm tp;
+
+    gettime(&tp);
+
+    arg1 = encode_int(mktime(&tp));
 }

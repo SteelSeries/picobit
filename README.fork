@@ -13,9 +13,9 @@ Fork is using libopencm3 library to access hardware.
    - Max memory usage up to 192KB, part of that memory is CCM(DMA uncapable)
      and should be used taken care of accordingly.
 
-* TODO [2/15]
+* TODO [4/18]
 
-- [ ] Clocks, timers
+- [ ] STM32F429I-DISCO
 - [ ] NAND interface
 - [ ] SD inteface
 - [ ] LWThreads
@@ -28,5 +28,8 @@ Fork is using libopencm3 library to access hardware.
 - [ ] SPI
 - [X] USART output
 - [X] LED's
+- [X] RTC
+- [X] Local seconds
+- [ ] Clocks, timers
 - [ ] FPU arithmetics
 - [ ] Redo Makefile structure

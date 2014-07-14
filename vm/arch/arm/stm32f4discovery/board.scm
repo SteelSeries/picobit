@@ -6,6 +6,10 @@
   (lambda (c)
     (#%putchar c)))
 
+(define clock
+  (lambda ()
+    (#%clock)))
+
 (define display
   (lambda (x)
     (if (string? x)

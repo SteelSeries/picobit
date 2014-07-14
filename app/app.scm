@@ -80,6 +80,7 @@
     (#%sleep 100)
     (set-led! 3 (remainder val 2))
     (map (lambda (x) (display x)) (list val " "))
+    (displayln (clock))
     (loop (+ 1 val))))
 
-;;(loop 1)
+(loop 1)
