@@ -20,5 +20,6 @@ void sleep(unsigned msec);
 void timer_init(void);
 void rtc_init(void);
 uint32_t mktime(const struct tm *tp);
+uint32_t get_systick(void);
 
 #endif

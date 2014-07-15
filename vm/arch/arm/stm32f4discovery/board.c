@@ -18,7 +18,7 @@
 
 void halt_with_error (void)
 {
-    set_led(BOARD_LED_RED, 1);
+    set_led(BOARD_LED_BLUE, 1);
     printf("\n\n\n\nError, halt!\n\n\n\n");
     while(1);
 }

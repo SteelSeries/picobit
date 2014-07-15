@@ -5,6 +5,7 @@
 #include <dispatch.h>
 #include <primitives.h>
 #include <bignum.h>
+#include <gc.h>
 
 #include "led.h"
 #include "time.h"
@@ -14,6 +15,8 @@ PRIMITIVE_UNSPEC(#%putchar, arch_putchar, 1)
 {
     a1 = decode_int(arg1);
     usart_putchar((char)a1);
+
+    arg1 = OBJ_FALSE;
 }
 
 PRIMITIVE_UNSPEC(#%sleep, arch_sleep, 1)
@@ -33,11 +36,23 @@ PRIMITIVE_UNSPEC(#%set-led!, arch_set_led, 2)
     arg2 = OBJ_FALSE;
 }
 
-PRIMITIVE_UNSPEC(#%clock, arch_clock, 0)
+PRIMITIVE(#%clock, arch_clock, 0)
 {
     struct tm tp;
+    time_t time;
 
     gettime(&tp);
 
-    arg1 = encode_int(mktime(&tp));
+    time = mktime(&tp);
+
+    arg1 = make_integer(time & 0xFFFF, encode_int(time >> 16));
+}
+
+PRIMITIVE(#%systick, arch_systick, 0)
+{
+    time_t time;
+
+    time = get_systick();
+
+    arg1 = make_integer(time & 0xFFFF, encode_int(time >> 16));
 }

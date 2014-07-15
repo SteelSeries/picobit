@@ -10,6 +10,10 @@
   (lambda ()
     (#%clock)))
 
+(define systick
+  (lambda ()
+    (#%systick)))
+
 (define display
   (lambda (x)
     (if (string? x)
@@ -58,3 +62,5 @@
   (lambda (x)
     (write x)
     (newline)))
+
+(define time->seconds (lambda (t) (quotient t 1000)))

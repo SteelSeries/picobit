@@ -50,7 +50,7 @@ static inline void irqrestore(uint16_t flags)
 
 void sys_tick_handler(void)
 {
-    if (g_sys_timer > 0) g_sys_timer --;
+    g_sys_timer++;
 }
 
 /* RTC configuration flow:
@@ -114,15 +114,22 @@ void rtc_init(void)
 
 void sleep(unsigned msec)
 {
-    g_sys_timer = msec;
-    while (g_sys_timer > 0);
+    uint32_t start_tick;
+
+    start_tick = g_sys_timer + msec;
+    while (start_tick > g_sys_timer);
+}
+
+uint32_t get_systick(void)
+{
+    return g_sys_timer;
 }
 
 void timer_init(void)
 {
     systick_set_clocksource(STK_CSR_CLKSOURCE_AHB);
     /* systick mhz */
-    systick_set_reload(/*180 * 1000*/168000);
+    systick_set_reload(168000);
     systick_interrupt_enable();
     systick_counter_enable();
 }
@@ -131,6 +138,7 @@ void gettime(struct tm *tp)
 {
     uint32_t tr, dr;
 
+    /* XXX: day may change while time will be for the previous day */
     tr = (uint32_t)RTC_TR;
     dr = (uint32_t)RTC_DR;
 
@@ -155,6 +163,7 @@ void gettime(struct tm *tp)
                           >> RTC_DR_YU_SHIFT) + 100;
 }
 
+/* TODO: Needs to be completly rewritten */
 uint32_t mktime(const struct tm *tp)
 {
     int dy, m, y, tmp;
