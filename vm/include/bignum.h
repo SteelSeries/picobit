@@ -5,6 +5,7 @@
 
 uint16 decode_int (obj o);
 obj encode_int (uint16 n);
+obj encode_long(uint32 n);
 
 #ifdef CONFIG_BIGNUM_LONG
 

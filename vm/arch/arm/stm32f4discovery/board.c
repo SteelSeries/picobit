@@ -109,7 +109,8 @@ void __rcc_enable(void)
     rcc_osc_on(LSI);
     rcc_wait_for_osc_ready(LSI);
 
-    rcc_osc_bypass_enable(HSE);
+    /* XXX: For some reason not working on Open-407VC ??? */
+//    rcc_osc_bypass_enable(HSE);
     rcc_clock_setup_hse_3v3(&hse_8mhz_3v3[CLOCK_3V3_168MHZ]);
 #endif
     rcc_peripheral_enable_clock(&RCC_APB1ENR,
@@ -121,12 +122,6 @@ void __rcc_enable(void)
                                 RCC_AHB1ENR_IOPCEN|RCC_AHB1ENR_IOPDEN|
                                 RCC_AHB1ENR_DMA1EN);
     rcc_peripheral_enable_clock(&RCC_AHB2ENR, RCC_AHB2ENR_OTGFSEN);
-//    rcc_periph_clock_enable(RCC_PWR);
-//    rcc_periph_clock_enable(RCC_SPI2);
-//    rcc_periph_clock_enable(RCC_GPIOA);
-//    rcc_periph_clock_enable(RCC_GPIOB);
-//    rcc_periph_clock_enable(RCC_GPIOC);
-//    rcc_periph_clock_enable(RCC_GPIOD);
     rcc_periph_clock_enable(RCC_RTC);
     rcc_periph_clock_enable(RCC_TIM6);
     rcc_periph_clock_enable(RCC_BKPSRAM);
@@ -137,6 +132,8 @@ void main ()
     /* Interrupts */
     __nvic_enable();
     __rcc_enable();
+
+    set_led(BOARD_LED_GREEN, 1);
 
     rtc_init();
     timer_init();

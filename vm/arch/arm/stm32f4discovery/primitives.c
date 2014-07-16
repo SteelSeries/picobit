@@ -56,20 +56,13 @@ PRIMITIVE_UNSPEC(#%set-led!, arch_set_led, 2)
 PRIMITIVE(#%clock, arch_clock, 0)
 {
     struct tm tp;
-    time_t time;
 
     gettime(&tp);
 
-    time = mktime(&tp);
-
-    arg1 = make_integer(time & 0xFFFF, encode_int(time >> 16));
+    arg1 = encode_long(mktime(&tp));
 }
 
 PRIMITIVE(#%systick, arch_systick, 0)
 {
-    time_t time;
-
-    time = get_systick();
-
-    arg1 = make_integer(time & 0xFFFF, encode_int(time >> 16));
+    arg1 = encode_long(get_systick());
 }

@@ -16,7 +16,7 @@
 	(readln (getchar) buf)
 	(if (not (= ch 13))
 	    (readln (getchar) (cons ch buf))
-	    (list->string buf)))))
+	    (list->string (reverse buf))))))
 
 (define putchar
   (lambda (c)

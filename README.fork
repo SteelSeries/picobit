@@ -13,7 +13,16 @@ Fork is using libopencm3 library to access hardware.
    - Max memory usage up to 192KB, part of that memory is CCM(DMA uncapable)
      and should be used taken care of accordingly.
 
-* TODO [4/19]
+* SDIO
+  D0  - PC8
+  D1  - PC9
+  D2  - PC10
+  D3  - PC11
+  CLK - PC12
+  CMD - PD2
+  CD  - PD3
+
+* TODO [6/24]
 
 - [ ] STM32F429I-DISCO
 - [ ] NAND interface
@@ -27,10 +36,17 @@ Fork is using libopencm3 library to access hardware.
 - [ ] ModBus
 - [ ] SPI
 - [ ] Sleep using WDG
+- [ ] Decide how to implement DMA data transfers to VM side, look closely at
+      alloc_ram_cell_init, start at list->string
 - [X] USART output
+- [X] USART input
 - [X] LED's
 - [X] RTC
 - [X] Local seconds
-- [ ] Clocks, timers
+- [X] Clocks, timers
+- [ ] Fix systick overflow(49 days)
 - [ ] FPU arithmetics
 - [ ] Redo Makefile structure
+- [ ] Rewrite mktime function
+- [ ] Fix LSI/HSE clocking junk(LSI being the RTC clock and HSE clocking
+      everything else)

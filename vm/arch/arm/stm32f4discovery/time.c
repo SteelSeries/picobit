@@ -83,15 +83,19 @@ void rtc_init(void)
     /* Clear reset flags */
     RCC_CSR |= RCC_CSR_RMVF;
     RCC_CSR &= ~RCC_CSR_RMVF;
-    /* LSI: LSION */
+    /* LSI: LSION, see NOTE: below */
     RCC_CSR |= RCC_CSR_LSION;
     while ((RCC_CSR & RCC_CSR_LSIRDY) == 0);
 
     /* reset RTC */
     RCC_BDCR |= RCC_BDCR_BDRST;
     RCC_BDCR &= ~RCC_BDCR_BDRST;
-    /* Enable HSE for RTC clock */
+    /* First: Disable all bits, then set desired clock source  */
     RCC_BDCR &= ~RCC_BDCR_RTCSEL_MASK;
+    /** NOTE: LSI is extremly unaccurate but due to unknown reasons I can't use
+     * HSE as clock source and since its discovery board code I can't set up
+     * crystal for LSE count
+     **/
     RCC_BDCR |= RCC_BDCR_RTCSEL_LSI;
     /* Actually enable */
     RCC_BDCR |= RCC_BDCR_RTCEN;

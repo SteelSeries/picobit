@@ -1,7 +1,7 @@
-;; (#%sleep 1000)
-;; (set-led! 0 0)
-;; (#%sleep 1000)
-;; (set-led! 0 1)
+(#%sleep 1000)
+(set-led! 0 0)
+(#%sleep 1000)
+(set-led! 0 1)
 
 ;; (display "Test\r\n")
 ;; (display '(1 2 3 4 5))
@@ -77,9 +77,8 @@
 
 (define read-loop
   (lambda ()
-    (#%sleep 1000)
-    (map (lambda (x) (display x)) (list "Read: " (readln (getchar) '())
-				   (newline)))
+    (map (lambda (x) (display x))
+	 (list "Read: " (readln (getchar) '()) (newline)))
     (read-loop)))
 
 (define loop
@@ -95,7 +94,5 @@
 		 (- rtc (time->seconds clk)) (newline))))
     (loop (+ 1 val))))
 
-(read-loop)
-
-
-;;(loop 1)
+;;(read-loop)
+(loop 1)

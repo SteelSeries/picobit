@@ -602,3 +602,11 @@ obj encode_int (uint16 n)
 	return alloc_ram_cell_init (BIGNUM_FIELD0, ENCODE_FIXNUM(0),
 	                            n >> 8, n & 0xff);
 }
+
+obj encode_long(uint32 n)
+{
+    if (n <= MAX_INT)
+        return encode_int(n);
+
+    return make_integer(n & 0xFFFF, encode_int(n >> 16));
+}

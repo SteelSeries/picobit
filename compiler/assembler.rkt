@@ -368,5 +368,7 @@
       (pretty-print
        (sort (hash->list instr-table) > #:key cdr)))
 
-    (begin0 (asm-write-hex port)
+    (begin0 (if (output-bin?)
+		(asm-write-code port)
+		(asm-write-hex port))
       (asm-end!))))

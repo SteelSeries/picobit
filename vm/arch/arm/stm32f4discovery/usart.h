@@ -3,6 +3,8 @@
 
 #define USART_RECV_BUF_LEN 256
 
+#define SERIAL_PORT USART6
+
 typedef struct __usart_buf
 {
     volatile uint16_t head;

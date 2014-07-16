@@ -16,14 +16,14 @@ void usart6_isr(void)
     uint16_t head;
     static uint8_t data = '\r';
 
-    if ((USART_CR1(USART6) & USART_CR1_RXNEIE) != 0) {
+    if ((USART_CR1(SERIAL_PORT) & USART_CR1_RXNEIE) != 0) {
         /* Reset recv buffer contents if its full */
         head = g_recv_buf.head + 1;
         if (head >= USART_RECV_BUF_LEN)
             head = 0;
 
-        while ((USART_SR(USART6) & USART_SR_RXNE) != 0) {
-            data = usart_recv(USART6);
+        while ((USART_SR(SERIAL_PORT) & USART_SR_RXNE) != 0) {
+            data = usart_recv(SERIAL_PORT);
 
             if (head != g_recv_buf.tail) {
                 g_recv_buf.buf[g_recv_buf.head] = data;
@@ -38,11 +38,11 @@ void usart6_isr(void)
 //        usart_enable_tx_interrupt(USART6);
     }
 #if 0
-    if (((USART_CR1(USART6) & USART_CR1_TXEIE) != 0) &&
-        ((USART_SR(USART6) & USART_SR_TXE) != 0)) {
-        usart_send(USART6, data);
+    if (((USART_CR1(SERIAL_PORT) & USART_CR1_TXEIE) != 0) &&
+        ((USART_SR(SERIAL_PORT) & USART_SR_TXE) != 0)) {
+        usart_send(SERIAL_PORT, data);
         /* TX event handled */
-        usart_disable_tx_interrupt(USART6);
+        usart_disable_tx_interrupt(SERIAL_PORT);
     }
 #endif
 }
@@ -50,7 +50,7 @@ void usart6_isr(void)
 void usart_write(const uint8_t *data, size_t len)
 {
     while (len--)
-        usart_send_blocking(USART6, *data++);
+        usart_send_blocking(SERIAL_PORT, *data++);
 }
 
 int usart_read(char *buf, size_t len)
@@ -96,7 +96,7 @@ int usart_getchar(char *ch)
 
 void usart_putchar(char c)
 {
-    usart_send_blocking(USART6, c);
+    usart_send_blocking(SERIAL_PORT, c);
 }
 
 void usart_start(void)
@@ -109,15 +109,15 @@ void usart_start(void)
     gpio_set_af(GPIOC, GPIO_AF8, GPIO7);
 
     /* USART configuration */
-    usart_set_baudrate(USART6, 115200);
-    usart_set_databits(USART6, 8);
-    usart_set_stopbits(USART6, USART_STOPBITS_1);
-    usart_set_mode(USART6, USART_MODE_TX_RX);
-    usart_set_parity(USART6, USART_PARITY_NONE);
-    usart_set_flow_control(USART6, USART_FLOWCONTROL_NONE);
+    usart_set_baudrate(SERIAL_PORT, 115200);
+    usart_set_databits(SERIAL_PORT, 8);
+    usart_set_stopbits(SERIAL_PORT, USART_STOPBITS_1);
+    usart_set_mode(SERIAL_PORT, USART_MODE_TX_RX);
+    usart_set_parity(SERIAL_PORT, USART_PARITY_NONE);
+    usart_set_flow_control(SERIAL_PORT, USART_FLOWCONTROL_NONE);
 
     /* Enable RX interrupts */
-    usart_enable_rx_interrupt(USART6);
+    usart_enable_rx_interrupt(SERIAL_PORT);
 
-    usart_enable(USART6);
+    usart_enable(SERIAL_PORT);
 }
