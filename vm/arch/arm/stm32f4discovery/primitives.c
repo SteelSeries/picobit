@@ -11,6 +11,23 @@
 #include "time.h"
 #include "usart.h"
 
+#include <printf.h>
+
+PRIMITIVE(#%getchar, arch_getchar, 1)
+{
+    char ch;
+    int ret;
+
+    a1 = decode_int(arg1);
+    if (a1 != 0) sleep(a1);
+
+    arg1 = OBJ_FALSE;
+
+    ret = usart_getchar(&ch);
+    if (ret == 0)
+        arg1 = encode_int(ch);
+}
+
 PRIMITIVE_UNSPEC(#%putchar, arch_putchar, 1)
 {
     a1 = decode_int(arg1);

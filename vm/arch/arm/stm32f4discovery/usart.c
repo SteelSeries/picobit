@@ -6,33 +6,92 @@
 
 #include "usart.h"
 
+usart_buf_t g_recv_buf = {
+    .head = 0,
+    .tail = 0,
+};
+
 void usart6_isr(void)
 {
-    static uint8_t data = 'A';
+    uint16_t head;
+    static uint8_t data = '\r';
 
-    /* Check if we were called because of RXNE. */
-    if (((USART_CR1(USART6) & USART_CR1_RXNEIE) != 0) &&
-        ((USART_SR(USART6) & USART_SR_RXNE) != 0)) {
-        /* Retrieve the data from the peripheral. */
-        data = usart_recv(USART6);
-        /* Enable transmit interrupt so it sends back the data. */
-        usart_enable_tx_interrupt(USART6);
+    if ((USART_CR1(USART6) & USART_CR1_RXNEIE) != 0) {
+        /* Reset recv buffer contents if its full */
+        head = g_recv_buf.head + 1;
+        if (head >= USART_RECV_BUF_LEN)
+            head = 0;
+
+        while ((USART_SR(USART6) & USART_SR_RXNE) != 0) {
+            data = usart_recv(USART6);
+
+            if (head != g_recv_buf.tail) {
+                g_recv_buf.buf[g_recv_buf.head] = data;
+                g_recv_buf.head = head;
+
+                if (++head >= USART_RECV_BUF_LEN)
+                    head = 0;
+            }
+        }
+
+        /* Enable TX interrupt to send back. */
+//        usart_enable_tx_interrupt(USART6);
     }
-
-    /* Check if we were called because of TXE. */
+#if 0
     if (((USART_CR1(USART6) & USART_CR1_TXEIE) != 0) &&
         ((USART_SR(USART6) & USART_SR_TXE) != 0)) {
-        /* Put data into the transmit register. */
         usart_send(USART6, data);
-        /* Disable the TXE interrupt as we don't need it anymore. */
+        /* TX event handled */
         usart_disable_tx_interrupt(USART6);
     }
+#endif
 }
 
-void usart_print(const uint8_t *data, size_t len)
+void usart_write(const uint8_t *data, size_t len)
 {
     while (len--)
         usart_send_blocking(USART6, *data++);
+}
+
+int usart_read(char *buf, size_t len)
+{
+    uint16_t tail;
+    uint16_t recv = 0;
+
+    tail = g_recv_buf.tail;
+
+    while (recv < len) {
+        if (g_recv_buf.head != tail) {
+            *buf++ = g_recv_buf.buf[tail];
+            if (++ tail >= USART_RECV_BUF_LEN)
+                tail = 0;
+
+            g_recv_buf.tail = tail;
+            recv ++;
+        } else
+            break;
+    }
+
+    return recv;
+}
+
+int usart_getchar(char *ch)
+{
+    uint16_t tail;
+
+    tail = g_recv_buf.tail;
+
+    if (g_recv_buf.head != tail) {
+        *ch = g_recv_buf.buf[tail];
+        if (++ tail >= USART_RECV_BUF_LEN)
+            tail = 0;
+
+        g_recv_buf.tail = tail;
+
+        return 0;
+    }
+
+    return -1;
 }
 
 void usart_putchar(char c)

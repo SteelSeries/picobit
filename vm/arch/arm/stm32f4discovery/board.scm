@@ -2,6 +2,22 @@
   (lambda (led val)
     (#%set-led! led val)))
 
+(define getchar
+  (lambda ()
+    (#%getchar 0)))
+
+(define getchar-wait
+  (lambda (delay)
+    (#%getchar delay)))
+
+(define readln
+  (lambda (ch buf)
+    (if (not ch)
+	(readln (getchar) buf)
+	(if (not (= ch 13))
+	    (readln (getchar) (cons ch buf))
+	    (list->string buf)))))
+
 (define putchar
   (lambda (c)
     (#%putchar c)))
