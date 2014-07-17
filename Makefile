@@ -15,7 +15,7 @@ vm:
 	[ -e vm/picobit-vm ] && cp vm/picobit-vm . || rm -f picobit-vm
 
 app.bin: app.hex
-	$(TOPDIR)/hex2bin.py app/app.hex
+	$(TOPDIR)/tools/hex2bin.py app/app.hex
 
 app.hex: compiler app/app.scm
 	racket $(TOPDIR)/compiler/picobit.rkt app/app.scm

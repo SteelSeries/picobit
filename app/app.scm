@@ -77,23 +77,20 @@
 
 (define read-loop
   (lambda ()
-    (loop 0)
-    (map (lambda (x) (display x))
-	 (list "Read: " (readln) (newline)))
+    (map (lambda (x) (displayln x))
+	 (list "Readline test:" (readln)))
     (read-loop)))
 
-(define loop
-  (lambda (val)
-    (sleep 25)
-    (set-led! 1 (remainder val 2))
-    (set-led! 2 (remainder (+ 1 val) 2))
-    (let ([rtc (clock)]
-	  [clk (systick)])
-      (map (lambda (x) (display x))
-	   (list val " "
-		 rtc " - " clk " = "
-		 (- rtc (time->seconds clk)) (newline))))
-    (loop (+ 1 val))))
+(define (loop val)
+  (sleep 50)
+  (set-led! 1 (remainder val 2))
+  (set-led! 2 (remainder (+ 1 val) 2))
+  (let ([rtc (clock)] [clk (systick)])
+    (map (lambda (x) (display x))
+	 (list val " "
+	       rtc " - " clk " = "
+	       (- rtc (time->seconds clk)) (newline))))
+  (loop (+ 1 val)))
 
-(loop 0)
 ;;(read-loop)
+(loop 0)

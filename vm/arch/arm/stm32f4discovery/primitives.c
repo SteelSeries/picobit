@@ -23,7 +23,11 @@ PRIMITIVE(#%getchar, arch_getchar, 1)
 
     arg1 = OBJ_FALSE;
 
-    ret = usart_getchar(&ch);
+    if (!a1)
+        while ((ret = usart_getchar(&ch)) != 0);
+    else
+        ret = usart_getchar(&ch);
+
     if (ret == 0)
         arg1 = encode_int(ch);
 }

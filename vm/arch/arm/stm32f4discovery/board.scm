@@ -14,14 +14,14 @@
     (#%getchar delay)))
 
 (define (readln)
-  (readln (getchar) '()))
+  (readln! (getchar) '()))
 
 (define readln!
   (lambda (ch buf)
     (if (not ch)
-	(readln (getchar) buf)
+	(readln! (getchar) buf)
 	(if (not (= ch 13))
-	    (readln (getchar) (cons ch buf))
+	    (readln! (getchar) (cons ch buf))
 	    (list->string (reverse buf))))))
 
 (define putchar
