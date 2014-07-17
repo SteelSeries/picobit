@@ -16,6 +16,7 @@
 #include "usart.h"
 #include "time.h"
 #include "led.h"
+#include "lcd.h"
 
 void halt_with_error (void)
 {
@@ -121,7 +122,8 @@ void __rcc_enable(void)
     rcc_peripheral_enable_clock(&RCC_AHB1ENR,
                                 RCC_AHB1ENR_IOPAEN|RCC_AHB1ENR_IOPBEN|
                                 RCC_AHB1ENR_IOPCEN|RCC_AHB1ENR_IOPDEN|
-                                RCC_AHB1ENR_DMA1EN);
+                                RCC_AHB1ENR_IOPEEN|RCC_AHB1ENR_DMA1EN);
+    rcc_peripheral_enable_clock(&RCC_AHB3ENR, RCC_AHB3ENR_FMCEN); /* LCD? */
     rcc_peripheral_enable_clock(&RCC_AHB2ENR, RCC_AHB2ENR_OTGFSEN);
     rcc_periph_clock_enable(RCC_RTC);
     rcc_periph_clock_enable(RCC_TIM6);
@@ -133,18 +135,22 @@ void main ()
     __nvic_enable();
     __rcc_enable();
 
-    /* Indicate that basic setup is done */
-    set_led(BOARD_LED_GREEN, 1);
+    /* Reset leds, indicate that basic setup is done */
+    set_led(BOARD_LED_ORANGE, 0);
+    set_led(BOARD_LED_BLUE,   0);
+    set_led(BOARD_LED_RED,    0);
+    set_led(BOARD_LED_GREEN,  1);
 
     rtc_init();
     timer_init();
 
+    usart_start();
+    init_printf(NULL, put_char);
+
     led_init();
     sdio_init();
 
-    usart_start();
-
-    init_printf(NULL, put_char);
+//    lcd_init();
 
     printf("Starting VM.\r\n");
 
