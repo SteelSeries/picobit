@@ -1,6 +1,6 @@
-(#%sleep 1000)
+(sleep 1000)
 (set-led! 0 0)
-(#%sleep 1000)
+(sleep 1000)
 (set-led! 0 1)
 
 ;; (display "Test\r\n")
@@ -77,13 +77,14 @@
 
 (define read-loop
   (lambda ()
+    (loop 0)
     (map (lambda (x) (display x))
-	 (list "Read: " (readln (getchar) '()) (newline)))
+	 (list "Read: " (readln) (newline)))
     (read-loop)))
 
 (define loop
   (lambda (val)
-    (#%sleep 100)
+    (sleep 25)
     (set-led! 1 (remainder val 2))
     (set-led! 2 (remainder (+ 1 val) 2))
     (let ([rtc (clock)]
@@ -94,5 +95,5 @@
 		 (- rtc (time->seconds clk)) (newline))))
     (loop (+ 1 val))))
 
+(loop 0)
 ;;(read-loop)
-(loop 1)

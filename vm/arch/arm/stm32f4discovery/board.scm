@@ -1,3 +1,6 @@
+(define (sleep delay)
+  (#%sleep delay))
+
 (define set-led!
   (lambda (led val)
     (#%set-led! led val)))
@@ -10,7 +13,10 @@
   (lambda (delay)
     (#%getchar delay)))
 
-(define readln
+(define (readln)
+  (readln (getchar) '()))
+
+(define readln!
   (lambda (ch buf)
     (if (not ch)
 	(readln (getchar) buf)

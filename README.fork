@@ -22,14 +22,13 @@ Fork is using libopencm3 library to access hardware.
   CMD - PD2
   CD  - PD3
 
-* TODO [6/24]
+* TODO [8/25]
 
-- [ ] STM32F429I-DISCO
-- [ ] NAND interface
-- [ ] SD inteface
-- [ ] LWThreads
-- [ ] CDC/ACM
+- [X] hex2bin converter
 - [ ] REPL
+- [X] STM32F429I-DISCO
+- [ ] NAND interface
+- [ ] CDC/ACM
 - [ ] LCD
 - [ ] Camera interface
 - [ ] Network stack(S3?)
@@ -50,3 +49,5 @@ Fork is using libopencm3 library to access hardware.
 - [ ] Rewrite mktime function
 - [ ] Fix LSI/HSE clocking junk(LSI being the RTC clock and HSE clocking
       everything else)
+- [ ] SDIO
+- [ ] MMCSD inteface

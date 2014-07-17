@@ -1,9 +1,4 @@
-ECHO = echo
-Q   ?= @
-
-ifdef CONFIG_ARM_STM32F4DISCOVERY
 ldscript := stm32f4xx.ld
-endif
 
 INCLUDE_DIRS = $(call unquote, $(CONFIG_LIBOPENCM3_PATH))/include/
 LD_DIRS = $(call unquote, $(CONFIG_LIBOPENCM3_PATH))/lib/
@@ -18,8 +13,6 @@ CFLAGS += -mcpu=cortex-m4 -mthumb -g -fno-hosted -nostdlib \
 arch-$(CONFIG_ARM_BOARD_STM32_F4DISCOVERY)   += board.c time.c usart.c sdio.c \
 						led.c printf.c primitives.c
 stdlib-$(CONFIG_ARM_BOARD_STM32_F4DISCOVERY) += board.scm
-
-load-address := \#x8008000
 
 arch-all: picobit.hex picobit.bin
 

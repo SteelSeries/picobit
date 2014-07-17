@@ -1,5 +1,9 @@
 (define light adc)
 
+(define (set-led! x y) #f)
+(define (readln)       #f)
+(define (systick)      #f)
+
 (define putchar
   (lambda (c)
     (#%putchar c 3)))
