@@ -12,6 +12,7 @@
 #include <libopencm3/stm32/rcc.h>
 
 #include "board.h"
+#include "sdio.h"
 #include "usart.h"
 #include "time.h"
 #include "led.h"
@@ -139,6 +140,8 @@ void main ()
     timer_init();
 
     led_init();
+    sdio_init();
+
     usart_start();
 
     init_printf(NULL, put_char);
