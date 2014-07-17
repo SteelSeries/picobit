@@ -21,8 +21,13 @@
 
 /* RGB565 */
 #define SET_COLOR(r,g,b)                                                \
-    (uint16_t)((((b) << 8) & 0xF800)|(((g) << 3) & 0x07E0)|((r) & 0x1F))
+    (uint16_t)(((((r) << 8) & 0xF800)|(((g) << 3) & 0x07E0)|((b) & 0x1F)) & 0xF7DE)
 
 void lcd_init(void);
+void lcd_clear(uint16_t color);
+
+inline void lcd_pixel(uint16_t x, uint16_t y, uint16_t data);
+
+
 
 #endif

@@ -33,6 +33,7 @@
  *
  * NOE - PD4
  * NWE - PD5
+ * NE1 - PD7
  * A16 - PD11
  */
 
@@ -42,84 +43,136 @@ static void __lcd_gpio_init(void)
     struct sdram_timing tim;
 
     /* D0, D1, D2, D3, NOE, NWE, D13, D14, D15, A16 */
-    gpio_set = GPIO0|GPIO1|GPIO4|GPIO5|GPIO8|GPIO9|GPIO10|GPIO11|GPIO14|GPIO15;
-    gpio_mode_setup(GPIOD, GPIO_MODE_AF, GPIO_PUPD_PULLUP, gpio_set);
+    gpio_set = (GPIO0|GPIO1|GPIO4|GPIO5|GPIO7|GPIO8|GPIO9|GPIO10|
+                GPIO11|GPIO14|GPIO15);
+    gpio_mode_setup(GPIOD, GPIO_MODE_AF, GPIO_PUPD_NONE, gpio_set);
     gpio_set_af(GPIOD, GPIO_AF12, gpio_set);
-    gpio_set_output_options(GPIOD, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, gpio_set);
+    gpio_set_output_options(GPIOD, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, gpio_set);
 
-    /* D4, D5, D6, D7, D8, D9, D10*/
-    gpio_set = GPIO7|GPIO8|GPIO9|GPIO10|GPIO11|GPIO12|GPIO13;
-    gpio_mode_setup(GPIOE, GPIO_MODE_AF, GPIO_PUPD_PULLUP, gpio_set);
+    /* D4, D5, D6, D7, D8, D9, D10, D11, D12 */
+    gpio_set = (GPIO7|GPIO8|GPIO9|GPIO10|GPIO11|GPIO12|GPIO13|GPIO14|GPIO15);
+    gpio_mode_setup(GPIOE, GPIO_MODE_AF, GPIO_PUPD_NONE, gpio_set);
     gpio_set_af(GPIOE, GPIO_AF12, gpio_set);
-    gpio_set_output_options(GPIOE, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, gpio_set);
+    gpio_set_output_options(GPIOE, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, gpio_set);
 
     /* Give LCD time to init, 100 msec */
     sleep(100);
+#if 0
+    FSMC_BCR1 = 0x00000010/*mem type*/|0x00001000/*write op*/;
+#endif
+//    FSMC_BWTR1 = 0x0FFFFFFF;
 
-    /* Setup timings */
+    tim.trcd = 0;
+    tim.trp  = 0;
+    tim.twr  = 0;
+    tim.trc  = 0; /* ? */
+    tim.tras = 5;
+    tim.txsr = 0; /* ? */
+    tim.tmrd = 5;
 
-    tim.trcd = 1;
-    tim.trp  = 1;
-    tim.twr  = 1;
-    tim.trc  = 1;
-    tim.tras = 1;
-    tim.txsr = 1;
-    tim.tmrd = 1;
+    (void)tim;
 
+    /* Timing setup */
     sdram_timing(&tim);
-
     /* Final setup for FSMC/FMC */
-    sdram_command(SDRAM_BANK1, SDRAM_CLK_CONF, 1, 1);
+    sdram_command(SDRAM_BANK1, SDRAM_NORMAL, 0, 0);
 }
 
 static void __lcd_setup(uint16_t id)
 {
-    LCD_WRITE(0x0000,0x0001); sleep(50); /* Enable LCD Oscillator */
-    LCD_WRITE(0x0003,0xA8A4); sleep(50);
-    LCD_WRITE(0x000C,0x0000); sleep(50);
-    LCD_WRITE(0x000D,0x080C); sleep(50);
-    LCD_WRITE(0x000E,0x2B00); sleep(50);
-    LCD_WRITE(0x001E,0x00B0); sleep(50);
-    LCD_WRITE(0x0001,0x2B3F); sleep(50); /* 320*240 0x2B3F */
-    LCD_WRITE(0x0002,0x0600); sleep(50);
-    LCD_WRITE(0x0010,0x0000); sleep(50);
-    LCD_WRITE(0x0011,0x6070); sleep(50);
-    LCD_WRITE(0x0005,0x0000); sleep(50);
-    LCD_WRITE(0x0006,0x0000); sleep(50);
-    LCD_WRITE(0x0016,0xEF1C); sleep(50);
-    LCD_WRITE(0x0017,0x0003); sleep(50);
-    LCD_WRITE(0x0007,0x0133); sleep(50);
-    LCD_WRITE(0x000B,0x0000); sleep(50);
-    LCD_WRITE(0x000F,0x0000); sleep(50);
-    LCD_WRITE(0x0041,0x0000); sleep(50);
-    LCD_WRITE(0x0042,0x0000); sleep(50);
-    LCD_WRITE(0x0048,0x0000); sleep(50);
-    LCD_WRITE(0x0049,0x013F); sleep(50);
-    LCD_WRITE(0x004A,0x0000); sleep(50);
-    LCD_WRITE(0x004B,0x0000); sleep(50);
-    LCD_WRITE(0x0044,0xEF00); sleep(50);
-    LCD_WRITE(0x0045,0x0000); sleep(50);
-    LCD_WRITE(0x0046,0x013F); sleep(50);
-    LCD_WRITE(0x0030,0x0707); sleep(50);
-    LCD_WRITE(0x0031,0x0204); sleep(50);
-    LCD_WRITE(0x0032,0x0204); sleep(50);
-    LCD_WRITE(0x0033,0x0502); sleep(50);
-    LCD_WRITE(0x0034,0x0507); sleep(50);
-    LCD_WRITE(0x0035,0x0204); sleep(50);
-    LCD_WRITE(0x0036,0x0204); sleep(50);
-    LCD_WRITE(0x0037,0x0502); sleep(50);
-    LCD_WRITE(0x003A,0x0302); sleep(50);
-    LCD_WRITE(0x003B,0x0302); sleep(50);
-    LCD_WRITE(0x0023,0x0000); sleep(50);
-    LCD_WRITE(0x0024,0x0000); sleep(50);
-    LCD_WRITE(0x0025,0x8000); sleep(50);
-    LCD_WRITE(0x004f,0); sleep(50);
-    LCD_WRITE(0x004e,0); sleep(50);
+#if 0
+    LCD_WRITE(0x0000,0x0001); /* Enable LCD Oscillator */
+    LCD_WRITE(0x0003,0xA8A4);
+    LCD_WRITE(0x000C,0x0000);
+    LCD_WRITE(0x000D,0x080C);
+    LCD_WRITE(0x000E,0x2B00);
+    LCD_WRITE(0x001E,0x00B0);
+    LCD_WRITE(0x0001,0x2B3F);/* 320*240 0x2B3F */
+    LCD_WRITE(0x0002,0x0600);
+    LCD_WRITE(0x0010,0x0000);
+    LCD_WRITE(0x0011,0x6070);
+    LCD_WRITE(0x0005,0x0000);
+    LCD_WRITE(0x0006,0x0000);
+    LCD_WRITE(0x0016,0xEF1C);
+    LCD_WRITE(0x0017,0x0003);
+    LCD_WRITE(0x0007,0x0133);
+    LCD_WRITE(0x000B,0x0000);
+    LCD_WRITE(0x000F,0x0000);
+    LCD_WRITE(0x0041,0x0000);
+    LCD_WRITE(0x0042,0x0000);
+    LCD_WRITE(0x0048,0x0000);
+    LCD_WRITE(0x0049,0x013F);
+    LCD_WRITE(0x004A,0x0000);
+    LCD_WRITE(0x004B,0x0000);
+    LCD_WRITE(0x0044,0xEF00);
+    LCD_WRITE(0x0045,0x0000);
+    LCD_WRITE(0x0046,0x013F);
+    LCD_WRITE(0x0030,0x0707);
+    LCD_WRITE(0x0031,0x0204);
+    LCD_WRITE(0x0032,0x0204);
+    LCD_WRITE(0x0033,0x0502);
+    LCD_WRITE(0x0034,0x0507);
+    LCD_WRITE(0x0035,0x0204);
+    LCD_WRITE(0x0036,0x0204);
+    LCD_WRITE(0x0037,0x0502);
+    LCD_WRITE(0x003A,0x0302);
+    LCD_WRITE(0x003B,0x0302);
+    LCD_WRITE(0x0023,0x0000);
+    LCD_WRITE(0x0024,0x0000);
+    LCD_WRITE(0x0025,0x8000);
+    LCD_WRITE(0x004f,0);
+    LCD_WRITE(0x004e,0);
 
-    LCD_WRITE(0x0011,0x6068); sleep(50);
+    LCD_WRITE(0x0011,0x6068);
+#endif
+    LCD_WRITE(0x0007,0x0021);
+  LCD_WRITE(0x0000,0x0001);
+  LCD_WRITE(0x0007,0x0023);
+  LCD_WRITE(0x0010,0x0000);
+  LCD_WRITE(0x0007,0x0033);
+  LCD_WRITE(0x0011,0x6830);
+  LCD_WRITE(0x0002,0x0600);
+  LCD_WRITE(0x0012,0x6CEB);
+  LCD_WRITE(0x0003,0xA8A4);
+  LCD_WRITE(0x000C,0x0000);
+  LCD_WRITE(0x000D,0x080C);
+  LCD_WRITE(0x000E,0x2B00);
+  LCD_WRITE(0x001E,0x00B0);
+  LCD_WRITE(0x0001,0x2b3F);
+  LCD_WRITE(0x0005,0x0000);
+  LCD_WRITE(0x0006,0x0000);
+  LCD_WRITE(0x0016,0xEF1C);
+  LCD_WRITE(0x0017,0x0103);
+  LCD_WRITE(0x000B,0x0000);
+  LCD_WRITE(0x000F,0x0000);
+  LCD_WRITE(0x0041,0x0000);
+  LCD_WRITE(0x0042,0x0000);
+  LCD_WRITE(0x0048,0x0000);
+  LCD_WRITE(0x0049,0x013F);
+  LCD_WRITE(0x004A,0x0000);
+  LCD_WRITE(0x004B,0x0000);
+  LCD_WRITE(0x0044,0xEF00);
+  LCD_WRITE(0x0045,0x0000);
+  LCD_WRITE(0x0046,0x013F);
+  LCD_WRITE(0x0030,0x0707);
+  LCD_WRITE(0x0031,0x0204);
+  LCD_WRITE(0x0032,0x0204);
+  LCD_WRITE(0x0033,0x0502);
+  LCD_WRITE(0x0034,0x0507);
+  LCD_WRITE(0x0035,0x0204);
+  LCD_WRITE(0x0036,0x0204);
+  LCD_WRITE(0x0037,0x0502);
+  LCD_WRITE(0x003A,0x0302);
+  LCD_WRITE(0x002F,0x12BE);
+  LCD_WRITE(0x003B,0x0302);
+  LCD_WRITE(0x0023,0x0000);
+  LCD_WRITE(0x0024,0x0000);
+  LCD_WRITE(0x0025,0x8000);
+  LCD_WRITE(0x004f,0x0000);
+  LCD_WRITE(0x004e,0x0000);
 }
 
-void __lcd_clear(uint16_t color)
+void lcd_clear(uint16_t color)
 {
     int i = 0;
 
@@ -131,10 +184,23 @@ void __lcd_clear(uint16_t color)
     }
 }
 
-void lcd_point_set(uint16_t x, uint16_t y, uint16_t data)
+inline void lcd_pixel(uint16_t x, uint16_t y, uint16_t data)
 {
     LCD_POS_SET(x, y);
-    LCD_WRITE(0x0022, data);
+    LCD_WRITE(0x22, data);
+}
+
+static void __lcd_test(void)
+{
+    uint16_t count = 0, mask;
+    int i, k;
+
+    for (i = 0; i < LCD_X_SIZE; i++) {
+        ++count; mask = 0xFFFF;
+        for (k = 0; k < LCD_Y_SIZE; k++) {
+            lcd_pixel(i, k, count & mask--);
+        }
+    }
 }
 
 void lcd_init(void)
@@ -149,13 +215,7 @@ void lcd_init(void)
     printf("LCD -> %X\r\n", (unsigned int)dev_code);
 
     __lcd_setup(dev_code);
-    __lcd_clear(SET_COLOR(0,0,0));
+    lcd_clear(SET_COLOR(0xFF,0xFF,0xFF));
 
-    int i, k;
-    for (i = 0; i < LCD_X_SIZE; i++) {
-        for (k = 0; k < LCD_Y_SIZE; k ++) {
-            lcd_point_set(i, k, SET_COLOR(0xFF,0xFF,0xFF));
-            sleep(50);
-        }
-    }
+    __lcd_test();
 }

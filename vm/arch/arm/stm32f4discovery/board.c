@@ -123,11 +123,15 @@ void __rcc_enable(void)
                                 RCC_AHB1ENR_IOPAEN|RCC_AHB1ENR_IOPBEN|
                                 RCC_AHB1ENR_IOPCEN|RCC_AHB1ENR_IOPDEN|
                                 RCC_AHB1ENR_IOPEEN|RCC_AHB1ENR_DMA1EN);
-    rcc_peripheral_enable_clock(&RCC_AHB3ENR, RCC_AHB3ENR_FMCEN); /* LCD? */
+    /* LCD related */
+    rcc_peripheral_enable_clock(&RCC_AHB3ENR,
+                                RCC_AHB3ENR_FMCEN|RCC_AHB3ENR_FSMCEN);
     rcc_peripheral_enable_clock(&RCC_AHB2ENR, RCC_AHB2ENR_OTGFSEN);
     rcc_periph_clock_enable(RCC_RTC);
     rcc_periph_clock_enable(RCC_TIM6);
     rcc_periph_clock_enable(RCC_BKPSRAM);
+
+//    rcc_periph_clock_enable(RCC_FSMC);
 }
 
 void main ()
@@ -150,7 +154,7 @@ void main ()
     led_init();
     sdio_init();
 
-//    lcd_init();
+    lcd_init();
 
     printf("Starting VM.\r\n");
 
