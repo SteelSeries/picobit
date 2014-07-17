@@ -6,7 +6,7 @@
 #endif
 
 #ifdef CONFIG_VM_DEBUG
-#ifdef CONFIG_ARM_STM32F4DISCOVERY
+#ifdef CONFIG_ARCH_ARM
   #include <printf.h>
 
   #define printf tfp_printf

@@ -130,10 +130,10 @@ void __rcc_enable(void)
 
 void main ()
 {
-    /* Interrupts */
     __nvic_enable();
     __rcc_enable();
 
+    /* Indicate that basic setup is done */
     set_led(BOARD_LED_GREEN, 1);
 
     rtc_init();
@@ -146,17 +146,7 @@ void main ()
 
     init_printf(NULL, put_char);
 
-    printf("  RCC_CR: 0x%X\r\n", RCC_CR);
-    printf(" RCC_CSR: 0x%X\r\n", RCC_CSR);
-    printf("RCC_BDCR: 0x%x\r\n", RCC_BDCR);
-    printf("RCC_CFGR: 0x%x\r\n", RCC_CFGR);
-    printf(" RCC_CIR: 0x%x\r\n", RCC_CIR);
-    printf("Waiting for INITF.\r\n");
-
-    printf("Starting interpreter.\r\n");
+    printf("Starting VM.\r\n");
 
     interpreter();
 }
-
-/* GPIOD - AHB2 */
-/* base: 0x40000000 + 0x08000000 + 0x0C00 */
