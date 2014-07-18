@@ -157,4 +157,29 @@ PRIMITIVE(bitwise-xor, bitwise_xor, 2)
 	arg2 = OBJ_FALSE;
 }
 
+PRIMITIVE(bitwise-and, bitwise_and, 2)
+{
+#ifdef CONFIG_BIGNUM_LONG
+	arg1 = bitwise_and(arg1, arg2);
+#else
+	decode_2_int_args ();
+	arg1 = encode_int (a1 & a2);
+#endif
+	arg2 = OBJ_FALSE;
+}
+
+PRIMITIVE(ash, arith_shift, 3)
+{
+    if (obj_eq(arg3, ZERO)) {
+        arg2 = OBJ_FALSE;
+        arg2 = OBJ_FALSE;
+    } else {
+        arg1 = (obj_eq(arg3, NEG1)) ?
+            shift_right(arg1, decode_int(arg2)) :
+            shift_left(arg1, decode_int(arg2));
+        arg2 = OBJ_FALSE;
+        arg3 = OBJ_FALSE;
+    }
+}
+
 // TODO add bitwise-and and bitwise-not

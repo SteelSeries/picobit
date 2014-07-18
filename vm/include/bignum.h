@@ -38,6 +38,7 @@ integer shr (integer x);
 integer negative_carry (integer carry);
 integer shl (integer x);
 integer shift_left (integer x, uint16 n);
+integer shift_right (integer x, uint16 n);
 integer add (integer x, integer y);
 integer invert (integer x);
 integer sub (integer x, integer y);
@@ -47,6 +48,7 @@ integer mulnonneg (integer x, integer y);
 integer divnonneg (integer x, integer y);
 integer bitwise_xor (integer x, integer y);
 integer bitwise_ior (integer x, integer y);
+integer bitwise_and (integer x, integer y);
 
 void bignum_gc_init();
 void bignum_gc_mark();

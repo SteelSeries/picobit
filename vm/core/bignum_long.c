@@ -107,7 +107,7 @@ integer norm (obj prefix, integer n)
 
 uint8 negp (integer x)
 {
-	/* negp(x) returns true iff x is negative */
+	/* negp(x) returns true if x is negative */
 
 	do {
 		x = integer_hi (x);
@@ -264,6 +264,32 @@ integer shl (integer x)
 	// clear the root then return
 	obj tmp = bignum_tmp1;
 	bignum_tmp1 = OBJ_FALSE;
+	return tmp;
+}
+
+integer shift_right (integer x, uint16 n)
+{
+	/* shift_left(x,n) returns the integer x shifted n bits to the left */
+
+	if (obj_eq (x, ZERO)) {
+		return x;
+	}
+
+	bignum_tmp2 = x;
+
+	while (n & (digit_width-1)) {
+		bignum_tmp2 = shr (bignum_tmp2);
+		n--;
+	}
+
+	while (n > 0) {
+		bignum_tmp2 = make_integer (0, bignum_tmp2);
+		n -= digit_width;
+	}
+
+	// clear the root then return
+	obj tmp = bignum_tmp2;
+	bignum_tmp2 = OBJ_FALSE;
 	return tmp;
 }
 
@@ -556,6 +582,32 @@ integer bitwise_xor (integer x, integer y)   // TODO similar to ior (only diff i
 		}
 
 		bignum_tmp1 = make_integer(integer_lo(x) ^ integer_lo(y),
+		                           bignum_tmp1);
+		x = integer_hi(x);
+		y = integer_hi(y);
+	}
+}
+
+integer bitwise_and (integer x, integer y)
+{
+	/* returns the bitwise and of x and y */
+
+	bignum_tmp1 = OBJ_FALSE;
+
+	for (;;) {
+		if (obj_eq(x, ZERO)) {
+			obj tmp = bignum_tmp1;
+			bignum_tmp1 = OBJ_FALSE;
+			return norm(tmp, y);
+		}
+
+		if (obj_eq(x, NEG1)) {
+			obj tmp = bignum_tmp1;
+			bignum_tmp1 = OBJ_FALSE;
+			return norm(tmp, x);
+		}
+
+		bignum_tmp1 = make_integer(integer_lo(x) & integer_lo(y),
 		                           bignum_tmp1);
 		x = integer_hi(x);
 		y = integer_hi(y);

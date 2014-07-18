@@ -1,3 +1,9 @@
+(define (set-color rgb)
+  rgb)
+
+(define (putpixel x y rgb)
+  (#%putpixel x y (set-color rgb)))
+
 (define (sleep delay)
   (#%sleep delay))
 

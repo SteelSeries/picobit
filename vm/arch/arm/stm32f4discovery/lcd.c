@@ -140,7 +140,7 @@ inline void lcd_pixel(uint16_t x, uint16_t y, uint16_t data)
     LCD_POS_SET(x, y);
     LCD_WRITE(0x22, data);
 }
-
+#if 0
 static void __lcd_test(void)
 {
     uint32_t count = 0, mask;
@@ -153,7 +153,7 @@ static void __lcd_test(void)
         }
     }
 }
-
+#endif
 void lcd_init(void)
 {
     uint16_t dev_code = 0;
@@ -168,5 +168,5 @@ void lcd_init(void)
     __lcd_setup(dev_code);
     lcd_clear(SET_COLOR(0xFF,0xFF,0xFF));
 
-    __lcd_test();
+//    __lcd_test();
 }

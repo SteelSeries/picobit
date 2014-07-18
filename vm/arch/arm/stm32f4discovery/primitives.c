@@ -10,8 +10,18 @@
 #include "led.h"
 #include "time.h"
 #include "usart.h"
+#include "lcd.h"
 
 #include <printf.h>
+
+PRIMITIVE(#%putpixel, arch_putpixel, 3)
+{
+    a1 = decode_int(arg1);
+    a2 = decode_int(arg2);
+    a3 = decode_int(arg3);
+
+    lcd_pixel(a1, a2, a3);
+}
 
 PRIMITIVE(#%getchar, arch_getchar, 1)
 {
