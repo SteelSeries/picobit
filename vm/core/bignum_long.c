@@ -3,6 +3,8 @@
 #include <debug.h>
 #include <gc.h>
 
+#include <printf.h>
+
 /* Temps in bignum algorithms must be registered as roots too, since
  * GC can occur during bignum operations (they allocate).
  * Bignum ops can share variables as long as they don't interfere.
@@ -192,6 +194,15 @@ uint16 integer_length (integer x)
 	return result;
 }
 
+integer negative_carry (integer carry)
+{
+	if (carry) {
+		return NEG1;
+	} else {
+		return ZERO;
+	}
+}
+/* TODO: gives wrong results when variable goes beyond 0 */
 integer shr (integer x)   // TODO have shift_right
 {
 	/* shr(x) returns the integer x shifted one bit to the right */
@@ -210,9 +221,9 @@ integer shr (integer x)   // TODO have shift_right
 			bignum_tmp1 = norm (bignum_tmp1, x);
 			break;
 		}
-
 		d = integer_lo (x);
 		x = integer_hi (x);
+
 		bignum_tmp1 =
 		        make_integer ((d >> 1) |
 		                      ((integer_lo (x) & 1) ? (1 << (digit_width - 1)) : 0),
@@ -223,15 +234,6 @@ integer shr (integer x)   // TODO have shift_right
 	obj tmp = bignum_tmp1;
 	bignum_tmp1 = OBJ_FALSE;
 	return tmp;
-}
-
-integer negative_carry (integer carry)
-{
-	if (carry) {
-		return NEG1;
-	} else {
-		return ZERO;
-	}
 }
 
 integer shl (integer x)
@@ -267,25 +269,66 @@ integer shl (integer x)
 	return tmp;
 }
 
+integer shift_bits(integer x, integer y)
+{
+    integer (*fptr)(integer x);
+    uint32 n;
+    int neg;
+
+    if (obj_eq (x, ZERO) || obj_eq(y, ZERO))
+        return x;
+
+    /* Get sign and actual value */
+    neg = negp(y);
+    n   = decode_long(y);
+    if (neg) {
+        fptr = shr;
+        n = (n ^ 0xFFFFFFFFUL) + 1; /* invert integer */
+    } else {
+        fptr = shl;
+    }
+
+    bignum_tmp2 = x;
+    while (n & (digit_width-1)) {
+        bignum_tmp2 = fptr(bignum_tmp2);
+        n--;
+    }
+
+    if (neg) {
+        while (n > 0) {
+            bignum_tmp2 = integer_hi (bignum_tmp2);
+            n -= digit_width;
+        }
+    } else {
+        while (n > 0) {
+            bignum_tmp2 = make_integer (0, bignum_tmp2);
+            n -= digit_width;
+	}
+    }
+
+    obj tmp = bignum_tmp2;
+    bignum_tmp2 = OBJ_FALSE;
+    return tmp;
+}
+
 integer shift_right (integer x, uint16 n)
 {
-	/* shift_left(x,n) returns the integer x shifted n bits to the left */
-
 	if (obj_eq (x, ZERO)) {
 		return x;
 	}
 
-	bignum_tmp2 = x;
+        n = (n ^ 0xFFFFUL) + 1;
 
-	while (n & (digit_width-1)) {
+	bignum_tmp2 = x;
+	while ((n & (digit_width-1))) {
 		bignum_tmp2 = shr (bignum_tmp2);
 		n--;
 	}
 
-	while (n > 0) {
-		bignum_tmp2 = make_integer (0, bignum_tmp2);
-		n -= digit_width;
-	}
+        while (n > 0) {
+            bignum_tmp2 = integer_hi (bignum_tmp2);
+            n -= digit_width;
+        }
 
 	// clear the root then return
 	obj tmp = bignum_tmp2;
@@ -631,13 +674,11 @@ uint16 decode_int (obj o)
 		if (!RAM_BIGNUM_P(o)) {
 			TYPE_ERROR("decode_int.1", "integer");
 		}
-
 		return (ram_get_field2 (o) << 8) | ram_get_field3 (o);
 	} else if (IN_ROM(o)) {
 		if (!ROM_BIGNUM_P(o)) {
 			TYPE_ERROR("decode_int.2", "integer");
 		}
-
 		return (rom_get_field2 (o) << 8) | rom_get_field3 (o);
 	} else {
 		TYPE_ERROR("decode_int.3", "integer");
@@ -657,8 +698,39 @@ obj encode_int (uint16 n)
 
 obj encode_long(uint32 n)
 {
-    if (n <= MAX_INT)
+    if (n <= MAX_INT) {
         return encode_int(n);
+    }
 
     return make_integer(n & 0xFFFF, encode_int(n >> 16));
+}
+
+/*
+ * Negative numbers goes like this:
+ *   lo1 = value; neg_flag = 0; zero = 0;
+ *   ...
+ *   loN = value; neg_flag = 1; zero = 0;
+ *   -----
+ *   ends. Actual val = 1 << digit_width - val;
+ *
+ */
+uint32 decode_long(integer x)
+{
+    obj tmp;
+    int n = 0;
+    uint32 val = 0;
+
+    while (!obj_eq (x, ZERO)) {
+        tmp = integer_hi(x);
+
+        if (obj_eq(tmp, NEG1)) {
+            val -= ((1 << digit_width) - integer_lo(x)) << (digit_width * n);
+            break;
+        } else
+            val += integer_lo(x) << (digit_width * n ++);
+
+        x = tmp;
+    }
+
+    return val;
 }

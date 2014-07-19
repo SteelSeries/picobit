@@ -53,6 +53,9 @@ integer bitwise_and (integer x, integer y);
 void bignum_gc_init();
 void bignum_gc_mark();
 
+uint32 decode_long(integer x);
+integer shift_bits(integer val, integer shift);
+
 #endif
 
 #endif

@@ -37,8 +37,9 @@
 
 #define MIN_FIXNUM_ENCODING 3
 #define MIN_FIXNUM -1
-#define MAX_FIXNUM 256
-#define MAX_INT    65536
+#define MAX_FIXNUM (1 << 8)
+#define MAX_INT    (1 << 6)
+#define MAX_LONG   (1 << 32)
 #define MIN_ROM_ENCODING (MIN_FIXNUM_ENCODING + MAX_FIXNUM - MIN_FIXNUM + 1)
 
 #define ZERO ENCODE_FIXNUM(0)

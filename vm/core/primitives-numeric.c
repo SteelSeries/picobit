@@ -168,18 +168,10 @@ PRIMITIVE(bitwise-and, bitwise_and, 2)
 	arg2 = OBJ_FALSE;
 }
 
-PRIMITIVE(ash, arith_shift, 3)
+PRIMITIVE(ash, shift_bits, 2)
 {
-    if (obj_eq(arg3, ZERO)) {
-        arg2 = OBJ_FALSE;
-        arg2 = OBJ_FALSE;
-    } else {
-        arg1 = (obj_eq(arg3, NEG1)) ?
-            shift_right(arg1, decode_int(arg2)) :
-            shift_left(arg1, decode_int(arg2));
-        arg2 = OBJ_FALSE;
-        arg3 = OBJ_FALSE;
-    }
+    arg1 = shift_bits(arg1, arg2);
+    arg2 = OBJ_FALSE;
 }
 
 // TODO add bitwise-and and bitwise-not
