@@ -1,0 +1,31 @@
+(define test-bitwise
+  (lambda ()
+    (map (lambda (x)
+	   (display x)
+	   (display " &=")
+	   (display (bitwise-and (car x) (car (cdr x))))
+	   (display ", |=")
+	   (displayln (bitwise-ior (car x) (car (cdr x)))))
+	 (list
+	  (list 0          0)
+	  (list 255        0)
+	  (list 0          255)
+	  (list 255        127)
+	  (list 127        255)
+	  (list 256        255)
+	  (list 255        256)
+	  (list 65535      65535)
+	  (list 131072     65535)
+	  (list 65535      131072)
+	  (list 4294967295 2147483648)
+	  (list 2147483648 4294967295)
+	  (list 4294967295 4294967295)))))
+
+(define test-ash
+  (lambda (val shm)
+    (let loop ((n 0))
+      (if (<= n shm)
+	  (begin
+	    (map (lambda (x) (display x))
+		 (list n "=" (ash val n) ", " (ash val (* -1 n)) "\r\n"))
+	    (loop (+ 1 n)))))))

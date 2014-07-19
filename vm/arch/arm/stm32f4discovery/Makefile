@@ -12,7 +12,7 @@ CFLAGS += -mcpu=cortex-m4 -mthumb -g -fno-hosted -nostdlib \
 
 arch-$(CONFIG_ARM_BOARD_STM32_F4DISCOVERY)   += board.c time.c usart.c sdio.c \
 						led.c primitives.c lcd.c
-stdlib-$(CONFIG_ARM_BOARD_STM32_F4DISCOVERY) += board.scm
+stdlib-$(CONFIG_ARM_BOARD_STM32_F4DISCOVERY) += board.scm graphics.scm
 
 arch-all: picobit.hex picobit.bin
 

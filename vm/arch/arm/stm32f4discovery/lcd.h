@@ -20,9 +20,9 @@
     } while (0)
 
 /* RGB565 */
-#define SET_COLOR(r,g,b) (uint16_t)(((((r) << 8) & 0xF800) |            \
-                                     (((g) << 3) & 0x07E0)  |           \
-                                     ((b) & 0x1F)) & 0xF7DE)
+#define SET_COLOR(r,g,b) (uint16_t)((((r) << 8) & 0xF800) |            \
+                                    (((g) << 3) & 0x07E0)  |           \
+                                    ((b) & 0x1F))
 
 void lcd_init(void);
 void lcd_clear(uint16_t color);

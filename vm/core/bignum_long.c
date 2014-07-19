@@ -202,8 +202,8 @@ integer negative_carry (integer carry)
 		return ZERO;
 	}
 }
-/* TODO: gives wrong results when variable goes beyond 0 */
-integer shr (integer x)   // TODO have shift_right
+
+integer shr (integer x)
 {
 	/* shr(x) returns the integer x shifted one bit to the right */
 
@@ -641,7 +641,7 @@ integer bitwise_and (integer x, integer y)
 		if (obj_eq(x, ZERO)) {
 			obj tmp = bignum_tmp1;
 			bignum_tmp1 = OBJ_FALSE;
-			return norm(tmp, y);
+			return norm(tmp, x);
 		}
 
 		if (obj_eq(x, NEG1)) {

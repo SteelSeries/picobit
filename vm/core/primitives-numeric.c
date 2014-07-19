@@ -174,4 +174,4 @@ PRIMITIVE(ash, shift_bits, 2)
     arg2 = OBJ_FALSE;
 }
 
-// TODO add bitwise-and and bitwise-not
+// TODO add bitwise-not
