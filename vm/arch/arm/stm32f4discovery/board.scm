@@ -1,3 +1,7 @@
+(define random
+  (lambda ()
+    (#%random)))
+
 (define (sleep delay)
   (#%sleep delay))
 

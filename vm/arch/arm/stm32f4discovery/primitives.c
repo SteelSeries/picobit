@@ -7,6 +7,7 @@
 #include <bignum.h>
 #include <gc.h>
 
+#include "random.h"
 #include "led.h"
 #include "time.h"
 #include "usart.h"
@@ -79,4 +80,12 @@ PRIMITIVE(#%clock, arch_clock, 0)
 PRIMITIVE(#%systick, arch_systick, 0)
 {
     arg1 = encode_long(get_systick());
+}
+
+PRIMITIVE(#%random, arch_random, 0)
+{
+    uint32_t rand;
+
+    rand = random();
+    arg1 = encode_long(rand);
 }

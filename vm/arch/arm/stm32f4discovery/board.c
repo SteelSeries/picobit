@@ -12,6 +12,7 @@
 #include <libopencm3/stm32/rcc.h>
 
 #include "board.h"
+#include "random.h"
 #include "sdio.h"
 #include "usart.h"
 #include "time.h"
@@ -21,23 +22,19 @@
 void halt_with_error (void)
 {
     set_led(BOARD_LED_BLUE, 1);
-    printf("\n\n\n\nError, halt!\n\n\n\n");
+    printf("\r\n\r\n\r\n\r\nError, halt!\r\n\r\n\r\n\r\n");
     while(1);
 }
 
 void __nvic_enable(void)
 {
-    /* USB CDC/ACM */
-    nvic_enable_irq(NVIC_OTG_FS_IRQ);
-    /* SPI RX */
-    nvic_enable_irq(NVIC_DMA1_STREAM3_IRQ);
-    /* SPI TX */
-    nvic_enable_irq(NVIC_DMA1_STREAM4_IRQ);
-    /* USART6 IRQ. */
-    nvic_enable_irq(NVIC_USART6_IRQ);
-    /* RTC Wakeup and alarm IRQ's. */
-    nvic_enable_irq(NVIC_RTC_WKUP_IRQ);
-    nvic_enable_irq(NVIC_RTC_ALARM_IRQ);
+    nvic_enable_irq(NVIC_OTG_FS_IRQ); /* USB CDC/ACM */
+    nvic_enable_irq(NVIC_DMA1_STREAM3_IRQ); /* SPI RX */
+    nvic_enable_irq(NVIC_DMA1_STREAM4_IRQ); /* SPI TX */
+    nvic_enable_irq(NVIC_USART6_IRQ); /* USART6 */
+    nvic_enable_irq(NVIC_RTC_WKUP_IRQ); /* RTC Wakeup */
+    nvic_enable_irq(NVIC_RTC_ALARM_IRQ); /* RTC alarm */
+    nvic_enable_irq(NVIC_HASH_RNG_IRQ); /* Random */
 }
 
 void put_char(void *p, char c)
@@ -127,9 +124,10 @@ void __rcc_enable(void)
     rcc_peripheral_enable_clock(&RCC_AHB3ENR,
                                 RCC_AHB3ENR_FMCEN|RCC_AHB3ENR_FSMCEN);
     rcc_peripheral_enable_clock(&RCC_AHB2ENR, RCC_AHB2ENR_OTGFSEN);
-    rcc_periph_clock_enable(RCC_RTC);
-    rcc_periph_clock_enable(RCC_TIM6);
-    rcc_periph_clock_enable(RCC_BKPSRAM);
+    rcc_periph_clock_enable(RCC_RTC); /* RTC */
+    rcc_periph_clock_enable(RCC_TIM6); /* Touchscreen ? */
+    rcc_periph_clock_enable(RCC_BKPSRAM); /* SRAM ? */
+    rcc_periph_clock_enable(RCC_RNG); /* Random */
 
 //    rcc_periph_clock_enable(RCC_FSMC);
 }
@@ -140,21 +138,27 @@ void main ()
     __rcc_enable();
 
     /* Reset leds, indicate that basic setup is done */
-    set_led(BOARD_LED_ORANGE, 0);
+    led_init();
     set_led(BOARD_LED_BLUE,   0);
-    set_led(BOARD_LED_RED,    0);
+    set_led(BOARD_LED_ORANGE, 1);
+    set_led(BOARD_LED_RED,    1);
     set_led(BOARD_LED_GREEN,  1);
 
     rtc_init();
     timer_init();
 
+    random_init();
+
     usart_start();
     init_printf(NULL, put_char);
 
-    led_init();
     sdio_init();
 
     lcd_init();
+
+
+    set_led(BOARD_LED_ORANGE, 0);
+    set_led(BOARD_LED_RED,    0);
 
     printf("Starting VM.\r\n");
 

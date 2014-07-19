@@ -317,9 +317,8 @@ integer shift_right (integer x, uint16 n)
 		return x;
 	}
 
-        n = (n ^ 0xFFFFUL) + 1;
-
 	bignum_tmp2 = x;
+
 	while ((n & (digit_width-1))) {
 		bignum_tmp2 = shr (bignum_tmp2);
 		n--;

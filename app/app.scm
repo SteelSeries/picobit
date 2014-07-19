@@ -11,7 +11,9 @@
     (map (lambda (x) (display x))
 	 (list val " "
 	       rtc " - " clk " = "
-	       (- rtc (time->seconds clk)) (newline))))
+	       (- rtc (time->seconds clk)) "; Random="
+	       (random)
+	       "\r\n")))
   (loop (+ 1 val)))
 
 (loop 0)
