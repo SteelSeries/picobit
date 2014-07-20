@@ -3,6 +3,7 @@
 (define (set-led! x y) #f)
 (define (readln)       #f)
 (define (systick)      #f)
+(define (random)       #f)
 
 (define putchar
   (lambda (c)

@@ -4,8 +4,6 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/fsmc.h>
 
-#include <printf.h>
-
 #include "time.h"
 #include "lcd.h"
 
@@ -154,6 +152,7 @@ static void __lcd_test(void)
     }
 }
 #endif
+
 void lcd_init(void)
 {
     uint16_t dev_code = 0;
@@ -163,10 +162,6 @@ void lcd_init(void)
     LCD_REG = 0;
     dev_code = LCD_SRAM;
 
-    printf("LCD -> %X\n", (unsigned int)dev_code);
-
     __lcd_setup(dev_code);
     lcd_clear(SET_COLOR(0xFF,0xFF,0xFF));
-
-//    __lcd_test();
 }

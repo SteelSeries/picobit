@@ -5,6 +5,9 @@
 
 #define SERIAL_PORT USART6
 
+#define printf tfp_printf
+#define sprintf tfp_sprintf
+
 typedef struct __usart_buf
 {
     volatile uint16_t head;

@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include <printf.h>
+#include <debug.h>
 
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/f4/rng.h>

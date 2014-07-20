@@ -6,7 +6,7 @@
 #include <libopencm3/stm32/rtc.h>
 #include <libopencm3/stm32/pwr.h>
 #include <libopencm3/stm32/rcc.h>
-#include <printf.h>
+#include <debug.h>
 
 #include "time.h"
 

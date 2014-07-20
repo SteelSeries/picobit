@@ -13,7 +13,7 @@
 #include "usart.h"
 #include "lcd.h"
 
-#include <printf.h>
+#include <debug.h>
 
 PRIMITIVE(#%putpixel, arch_putpixel, 3)
 {
