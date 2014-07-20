@@ -4,7 +4,7 @@
 (set-led! 0 1)
 
 (define (loop val)
-  (sleep 50)
+;;  (sleep 50)
   (set-led! 1 (remainder val 2))
   (set-led! 2 (remainder (+ 1 val) 2))
   (let ([rtc (clock)] [clk (systick)])
@@ -13,7 +13,7 @@
 	       rtc " - " clk " = "
 	       (- rtc (time->seconds clk)) "; Random="
 	       (random)
-	       "\r\n")))
+	       ".\n")))
   (loop (+ 1 val)))
 
 (loop 0)

@@ -17,6 +17,7 @@ choice
 	config	ARCH_ARM
 		bool "ARM microcontrollers"
 		select ARCH_32BIT
+		select ERROR_HANDLING
 endchoice
 
 config ERROR_HANDLING

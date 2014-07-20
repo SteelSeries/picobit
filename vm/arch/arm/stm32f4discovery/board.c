@@ -19,22 +19,15 @@
 #include "led.h"
 #include "lcd.h"
 
-void halt_with_error (void)
-{
-    set_led(BOARD_LED_BLUE, 1);
-    printf("\r\n\r\n\r\n\r\nError, halt!\r\n\r\n\r\n\r\n");
-    while(1);
-}
-
 void __nvic_enable(void)
 {
-    nvic_enable_irq(NVIC_OTG_FS_IRQ); /* USB CDC/ACM */
+    nvic_enable_irq(NVIC_OTG_FS_IRQ);       /* USB CDC/ACM */
     nvic_enable_irq(NVIC_DMA1_STREAM3_IRQ); /* SPI RX */
     nvic_enable_irq(NVIC_DMA1_STREAM4_IRQ); /* SPI TX */
-    nvic_enable_irq(NVIC_USART6_IRQ); /* USART6 */
-    nvic_enable_irq(NVIC_RTC_WKUP_IRQ); /* RTC Wakeup */
-    nvic_enable_irq(NVIC_RTC_ALARM_IRQ); /* RTC alarm */
-    nvic_enable_irq(NVIC_HASH_RNG_IRQ); /* Random */
+    nvic_enable_irq(NVIC_USART6_IRQ);       /* USART6 */
+    nvic_enable_irq(NVIC_RTC_WKUP_IRQ);     /* RTC Wakeup */
+    nvic_enable_irq(NVIC_RTC_ALARM_IRQ);    /* RTC alarm */
+    nvic_enable_irq(NVIC_HASH_RNG_IRQ);     /* Random */
 }
 
 void put_char(void *p, char c)
@@ -160,7 +153,7 @@ void main ()
     set_led(BOARD_LED_ORANGE, 0);
     set_led(BOARD_LED_RED,    0);
 
-    printf("Starting VM.\r\n");
+    printf("Starting VM.\n");
 
     interpreter();
 }

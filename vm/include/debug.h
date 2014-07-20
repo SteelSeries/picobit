@@ -5,14 +5,16 @@
 #include <stdio.h>
 #endif
 
-#ifdef CONFIG_VM_DEBUG
 #ifdef CONFIG_ARCH_ARM
-  #include <printf.h>
-
-  #define printf tfp_printf
-  #define sprintf tfp_sprintf
-  #define fflush do {} while (0)
+#include <printf.h>
+#define printf tfp_printf
+#define sprintf tfp_sprintf
+#define fflush(x...) do {} while (0)
+#define fprintf(s, fmt, arg...) do { printf(fmt, ##arg); } while (0)
 #endif
+
+
+#ifdef CONFIG_VM_DEBUG
 #define IF_TRACE(x) x
 #else
 #define IF_TRACE(x)

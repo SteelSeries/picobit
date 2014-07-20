@@ -79,7 +79,6 @@
 	   (display "#<object>")))))
 
 (define (newline)
-  (#%putchar #\return)
   (#%putchar #\newline))
 
 (define (displayln x) (display x) (newline))

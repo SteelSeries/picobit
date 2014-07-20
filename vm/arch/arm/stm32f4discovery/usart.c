@@ -96,6 +96,9 @@ int usart_getchar(char *ch)
 
 void usart_putchar(char c)
 {
+    if (c == '\n')
+        usart_send_blocking(SERIAL_PORT, '\r');
+
     usart_send_blocking(SERIAL_PORT, c);
 }
 

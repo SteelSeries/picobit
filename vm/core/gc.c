@@ -19,12 +19,15 @@ void init_ram_heap ()
 	free_list = 0;
 
 	while (o > bound) {
-		// we don't want to add globals to the free list, and globals occupy the
-		// beginning of memory at the rate of 2 globals per word (car and cdr)
-		ram_set_gc_tags (o, GC_TAG_UNMARKED);
-		ram_set_car (o, free_list);
-		free_list = o;
-		o--;
+            /*
+             * we don't want to add globals to the free list, and globals
+             * occupy the beginning of memory at the rate of 2 globals per
+             * word (car and cdr)
+             */
+            ram_set_gc_tags (o, GC_TAG_UNMARKED);
+            ram_set_car (o, free_list);
+            free_list = o;
+            o--;
 	}
 
 	free_vec_pointer = VEC_TO_RAM_OBJ(MIN_VEC_ENCODING);
@@ -181,6 +184,7 @@ void sweep ()
 #ifdef CONFIG_GC_STATISTICS
 	if (n > max_live) {
 		max_live = n;
+
 #ifdef CONFIG_GC_DEBUG
 		printf ("**************** memory needed = %d\n", max_live+1);
 		fflush (stdout);
@@ -230,6 +234,7 @@ obj alloc_ram_cell ()
 #endif
 
 	if (free_list == 0) {
+
 #ifndef CONFIG_GC_DEBUG
 		gc ();
 
@@ -350,7 +355,6 @@ obj alloc_vec_cell (uint16 n, obj from)
 		if (gc_done) { // we gc'd, but no space is big enough for the vector
 			ERROR("alloc_vec_cell", "no room for vector");
 		}
-
 #ifndef CONFIG_GC_DEBUG
 		gc ();
 		compact();

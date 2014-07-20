@@ -40,16 +40,13 @@ void random_init(void)
 long random(void)
 {
     long rnd;
-    volatile int ready = 0;
 
     g_rand.len     = sizeof(long);
     g_rand.buf     = (uint8_t *)&rnd;
 
     __start();
 
-    while (!ready) {
-        ready = g_rand.ready;
-    }
+    while (!g_rand.ready);
 
     return rnd;
 }

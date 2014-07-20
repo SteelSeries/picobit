@@ -163,7 +163,7 @@ void lcd_init(void)
     LCD_REG = 0;
     dev_code = LCD_SRAM;
 
-    printf("LCD -> %X\r\n", (unsigned int)dev_code);
+    printf("LCD -> %X\n", (unsigned int)dev_code);
 
     __lcd_setup(dev_code);
     lcd_clear(SET_COLOR(0xFF,0xFF,0xFF));
